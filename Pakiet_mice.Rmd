@@ -10,6 +10,7 @@ output: beamer_presentation
 
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = FALSE)
+library(mice)
 ```
 
 ## Wprowadzenie
@@ -96,7 +97,13 @@ Niektóre metody imputacji możemy zastosować do każdego typu danych.
 
 ## Generowanie braków danych
 
-Funkcja ampute
+```{r ampute, results=FALSE}
+iris_new <- iris[,-5]
+iris_amputed <- ampute(iris_new, prop = 0.5, mech = "MCAR")
+#invisible(md.pattern(iris_amputed$amp))
+mice::bwplot(iris_amputed, which.pat = 1)
+```
+
 
 ## Zebranie wyników analiz
 
@@ -106,3 +113,4 @@ Funkcja pool
 
 - boys
 - pattern
+- brandsma
