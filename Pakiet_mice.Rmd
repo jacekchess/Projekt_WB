@@ -11,6 +11,7 @@ output: beamer_presentation
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = FALSE)
 library(mice)
+library(knitr)
 ```
 
 ## Wprowadzenie
@@ -43,6 +44,21 @@ Dane podzielone są na 4 kategorie:
 - nieuporządkowane dane kategoryczne (dane typu factor z więcej niż 2 poziomami)
 - uporządkowane dane kategoryczne (dane typu factor z więcej niż 2 poziomami uporządkowanymi)
 
+## Zbiory danych
+
+- boys (wzrost, waga, wiek ... duńskich chłopców)
+- brandsma (dane o uczniach z różnych szkół)
+- pattern (4 proste zbiory danych z różnymi wzorcami braków danych)
+
+---
+
+```{r info, echo=TRUE, fig.height=3,fig.width=6}
+# nie mam pojecia co zrobic zeby output sie zmiescił na slajdzie :(
+# zajmujemy sie boys bo maja ordered/unordered factor -  nie mają binarnej kolumny - to nw, najwyżej inny zbiór danych?
+str(boys)
+summary(boys)
+```
+
 ## Dowolne dane
 
 Niektóre metody imputacji możemy zastosować do każdego typu danych.
@@ -71,6 +87,14 @@ Niektóre metody imputacji możemy zastosować do każdego typu danych.
 - 2lonly.mean (Level-2 class mean)
 - 2lonly.norm (Level-2 class normal)
 
+---
+
+```{r num, echo=TRUE}
+dutch_boys <- boys
+imp <- mice(dutch_boys[,-c(6,7,9)], method="pmm", m=3, maxit=3)
+dutch_boys[,-c(6,7,9)] <- complete(imp)
+```
+
 ## Dane binarne
 
 - logreg (logistic regression/regresja logistyczna) (domyślna)
@@ -82,10 +106,23 @@ Niektóre metody imputacji możemy zastosować do każdego typu danych.
 - polyreg (Polytomous logistic regression) (domyślna)
 - lda (liniowa analiza dyskryminacyjna)
 
+---
+
+```{r lda, echo=TRUE}
+imp <- mice(dutch_boys[,-9], method="lda", m=3, maxit=3)
+dutch_boys[,-9] <- complete(imp)
+```
 
 ## Uporządkowane dane kategoryczne
 
 - polr (Proportional odds model) (domyślna)
+
+---
+
+```{r polr, echo=TRUE}
+imp <- mice(dutch_boys, method="polr", m=3, maxit=3)
+dutch_boys <- complete(imp)
+```
 
 ## Wykresy 
 
@@ -97,20 +134,44 @@ Niektóre metody imputacji możemy zastosować do każdego typu danych.
 
 ## Generowanie braków danych
 
-```{r ampute, results=FALSE}
-iris_new <- iris[,-5]
-iris_amputed <- ampute(iris_new, prop = 0.5, mech = "MCAR")
-#invisible(md.pattern(iris_amputed$amp))
-mice::bwplot(iris_amputed, which.pat = 1)
+- `ampute`
+- generowanie brakujących danych potrzebnych do symulacji
+  - określony procent danych zostaje zastąpiony NA 
+    (obserwacje są wybierane losowo)
+  - różne mechanizmy: MAR, MCAR, MNAR
+  - określenie wzorca braków danych oraz częstotliwości 
+    jego wystąpienia
+\
+- `bwplot`
+
+---
+
+```{r} 
+set.seed(1)
+```
+```{r ampute, echo=TRUE,results=FALSE}
+iris_amp <- ampute(iris[,-5], prop = 0.5, mech = "MCAR")
+mice::bwplot(iris_amp, which.pat = 1)
+
 ```
 
+## Sprawdzenie wzorca brakujących danych
+
+- `md.pattern`
+- wyświetlenie wzorca brakujących danych w formie wykresu (oraz tabeli - w konsoli)
+
+---
+```{r, echo=TRUE, fig.height=3, fig.width=6,out.width='80%', fig.align='center',fig.show='hide'}
+md.pattern(iris_amp$amp, plot = TRUE, rotate.names = TRUE)
+```
+---  
+
+```{r, echo= TRUE,  fig.height=4, fig.width=6, results='hide', fig.keep='all'}
+md.pattern(iris_amp$amp, plot = TRUE, rotate.names = TRUE)
+```
 
 ## Zebranie wyników analiz
 
 Funkcja pool
 
-## Zbiory danych
 
-- boys
-- pattern
-- brandsma
