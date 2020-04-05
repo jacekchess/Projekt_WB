@@ -253,5 +253,13 @@ str(mtcars_amp)
 
 ## Zebranie wyników analiz
 
-Funkcja pool
+- Funkcja pool
 
+---
+```{r pool, results='hide'}
+temp <- mice(dutch_boys, m = 20, maxit = 5, seed = 123)
+modelFit <- with(temp, lm(age ~ hgt + wgt))
+```
+```{r}
+knitr::kable(summary(pool(modelFit)), align = "c")
+```
