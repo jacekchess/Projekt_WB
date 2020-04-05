@@ -39,8 +39,6 @@ Pakiet mice zawiera funkcje służące do:
 - boys (wzrost, waga, wiek ... duńskich chłopców)
 - brandsma (dane o uczniach z różnych szkół)
 - pattern1,2,3,4 (proste zbiory danych z różnymi wzorcami braków danych)
-- mtcars (parametry różnych marek samochodów)
-- iris (dobrze znany zbiór o płatkach kwiatów)
 
 
 ## Generowanie braków danych
@@ -247,7 +245,7 @@ str(mtcars_amp)
 ```
 
 ---
-```{r polr}
+```{r}
 imp <- mice(mtcars_amp[,c(8,9)], method="logreg")
 mtcars_amp[,c(8,9)] <- complete(imp)
 str(mtcars_amp)
