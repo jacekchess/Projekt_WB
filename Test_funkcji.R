@@ -1,16 +1,30 @@
 library(mice)
 library(visdat)
 
-# 2 zbiory wbudowane w mice. Może warto robić przykłady na jednym z nich?
-# Jak tak to którym?
-
+## Zbiory dostępne w pakiecie mice
 summary(brandsma)
+str(brandsma)
 summary(boys)
 summary(mtcars)
-dim(iris)
+summary(iris)
+
+## Amputacja
 
 iris_new <- iris[,-5]
-mtcars_amputed <- ampute(iris_new, prop = 0.5, mech = "MCAR")
-summary(mtcars_amputed$amp)
-md.pattern(mtcars_amputed$amp)
-mice::bwplot(mtcars_amputed, which.pat = 1)
+iris_amp <- ampute(data = iris_new, # dane muszą być numeryczne
+                  prop = 0.5, # proporcja danych do usunięcia
+                  # patterns - ramka danych wskazująca gdzie usunąć
+                  mech = "MCAR" # Missing Completely at Random 
+                  )
+summary(iris_amp$amp)
+
+## Wizualizacja brakujących danych
+
+mice::bwplot(iris_amp, which.pat = 1)
+# lattice
+md.pattern(iris_amp$amp)
+
+# 
+
+
+
