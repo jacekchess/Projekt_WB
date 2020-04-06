@@ -43,7 +43,67 @@ mice::bwplot(iris_amp, which.pat = 1)
 # lattice
 md.pattern(iris_amp$amp)
 
-# 
+fluxplot(iris_amp$amp)
 
+## Imputacja danych
 
+dutch_boys <- boys
 
+summary(dutch_boys)
+
+# mice samo rozpoznaje kolumny które może imputowac daną metoda
+# w tym przypadku wszystkie z brakami można uzupełnić pmm
+imp <- mice(dutch_boys,
+            method="pmm", m=3, maxit=3)
+
+dutch_boys <- complete(imp)
+str(dutch_boys)
+
+# możemy też wyspecyfikować które kolumny chcemy uzupełnić jaką metodą
+# odpowiednią dla typu danych
+
+dutch_boys_2 <- boys 
+str(dutch_boys_2)
+
+# wybieramy tylko kolumny numeryczne
+imp1 <- mice(dutch_boys_2[,-c(6,7,9)],
+            method="pmm", m=3, maxit=3)
+
+dutch_boys_2[,-c(6,7,9)] <- complete(imp1)
+ 
+# teraz kolumny 6,7 czyli nieuporządkowane dane kategoryczne
+imp2 <- mice(dutch_boys_2[,-9], method="lda", m=3, maxit=3)
+dutch_boys_2[,-9] <- complete(imp2)
+
+# i na koniec pozostała kolumna (uporządkowane kategoryczne)
+imp3 <- mice(dutch_boys_2, method="polr", m=3, maxit=3)
+dutch_boys_2 <- complete(imp3)
+
+summary(dutch_boys_2)
+
+## Metody wizualizacji danych imputowanych
+
+# niebieski - "normalne" dane, czerwony - imputowane
+densityplot(imp1) # tylko dla danych ciągłych !!!
+
+# czerwone - dane imputowane
+stripplot(imp1,col=c("grey",mdc(2)),pch=c(1,20))
+
+xyplot(imp2, gen+phb ~ hgt+wgt,
+       cex=1,col=c("grey",mdc(2)),pch=c(1,20))
+
+## Zebranie wyników analiz 
+
+dutch_boys <- boys
+
+# imputacja
+temp <- mice(dutch_boys, m = 20, maxit = 5, seed = 123)
+
+# dopasowanie modelu lm 
+modelFit <- with(data=temp, 
+                 expr=lm(age ~ hgt + wgt))
+
+summary(modelFit)
+
+# zebranie wyników
+summary(pool(modelFit))
