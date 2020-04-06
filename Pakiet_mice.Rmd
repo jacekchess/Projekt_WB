@@ -23,15 +23,13 @@ MICE - Multivariate Imputation by Chained Equations
 
 Pakiet mice zawiera funkcje służące do:
 
-- generowania symulowanych niekompletnych danych (-> ampute)
-- sprawdzenia wzorca brakujących danych (-> md.pattern, ...)
-- imputacji brakujących danych (wielokrotnie) (-> mice)
+- generowania symulowanych niekompletnych danych (ampute)
+- sprawdzenia wzorca brakujących danych (md.pattern ...)
+- imputacji brakujących danych (wielokrotnie) (mice)
 - diagnozowania jakości imputowanych wartości (jakie funkcje?) 
 - analizy każdego uzupełnionego zbioru danych (?)
 - zebrania wyników powtarzanych analiz (-> pool)
 - przechowywania i eksportowania imputowanych danych w różnych formatach (?)
-- (Incorporate custom imputation methods)?
-
 
 
 ## Zbiory danych dostępne w pakiecie mice
@@ -70,9 +68,10 @@ iris_amp <- ampute(iris[,-5], prop = 0.5, mech = "MCAR")
 Więkoszość metod do rysowania wykresów nadpisuje funkcje z pakietu `lattice`.
 
 - `bwplot` 
+  - boxploty ...
 - `md.pattern`
-- wyświetlenie wzorca brakujących danych w formie wykresu (oraz tabeli - w konsoli)
-- `fluxplot` <- # done
+  - wyświetlenie wzorca brakujących danych w formie wykresu (oraz tabeli - w konsoli)
+- `fluxplot` 
 
 ---
 
@@ -80,19 +79,22 @@ Więkoszość metod do rysowania wykresów nadpisuje funkcje z pakietu `lattice`
 mice::bwplot(iris_amp, which.pat = 1)
 ```
 
-```{r, echo= TRUE,  fig.height=4, fig.width=6, results='hide', fig.keep='all'}
-md.pattern(iris_amp$amp, plot = TRUE, rotate.names = TRUE)
+---
+
+```{r, echo= TRUE, fig.show='hold'}
+md.pattern(iris_amp$amp,plot = FALSE, rotate.names = TRUE)
 ```
 
 ---
 
-```{r, echo=TRUE, fig.height=3, fig.width=6,out.width='80%', fig.align='center',fig.keep='all', results='hide'}
+```{r, echo=TRUE, fig.height=4, fig.width=6, results='hide', fig.keep='all'}
 md.pattern(iris_amp$amp, plot = TRUE, rotate.names = TRUE)
 ```
 
 ---
 
 ### Fluxplot
+
 Dla każdej zmiennej obliczane są 2 wartości:
 
  - Influx - liczba par zmiennych takich, że w danej jest brak a w drugiej nie, podzielona przez wszystkie obserwacje. Dane pełne: 0, Dane całkowicie brakujące:1
@@ -105,11 +107,6 @@ Dla każdej zmiennej obliczane są 2 wartości:
 fluxplot(iris_amp$amp)
 ```
 
-## Inne metody wizualizacji danych imputowanych
-
-- xyplot 
-- densityplot 
-- stripplot
 
 # Imputacja danych
 
@@ -124,6 +121,7 @@ str(boys)
 ---
 
 Zbiór zawiera już braki danych, ma kolumny:
+
  - numeryczne
  - kategoryczne uporządkowane
  - kategoryczne nieuporządkowane
@@ -163,7 +161,7 @@ Niektóre metody imputacji możemy zastosować do każdego typu danych.
 
 ---
 
-```{r num, results='hide'}
+```{r num}
 dutch_boys<-boys
 imp <- mice(dutch_boys[,-c(6,7,9)],
             method="pmm", m=3, maxit=3)
@@ -172,17 +170,20 @@ imp <- mice(dutch_boys[,-c(6,7,9)],
 dutch_boys[,-c(6,7,9)] <- complete(imp)
 ```
 
----
+
 ## Metody wizualizacji danych imputowanych
 
 - densityplot 
 - stripplot
 - xyplot 
 
+---
 
-```{r densityplot}
+```{r com, echo=FALSE}
 ## co on właściwie rysuje?
 ## argumenty na.groups i groups
+```
+```{r densityplot}
 densityplot(imp)
 ```
 
@@ -197,6 +198,7 @@ stripplot(imp,col=c("grey",mdc(2)),pch=c(1,20))
 
 - polyreg (Polytomous logistic regression) (domyślna)
 - lda (liniowa analiza dyskryminacyjna)
+
 
 ```{r lda, results='hide'}
 imp <- mice(dutch_boys[,-9], method="lda", m=3, maxit=3)
@@ -233,10 +235,12 @@ xyplot(imp,reg ~ hgt+wgt,
 
 ---
 
-```{r mtcars}
+```{r comment, echo=FALSE}
 # Ponieważ w zbiorze danych boys nie ma danych binarnych,
 # posłużymy się zbiorem mtcars.
 # Usuwamy tylko w tych dwóch kolumach: vs i am
+```
+```{r mtcars}
 mtcars_amp<-ampute(data=mtcars,
                    patterns=rbind(
                      c(1,1,1,1,1,1,1,0,1,1,1),
@@ -245,10 +249,11 @@ mtcars_amp<-ampute(data=mtcars,
                    mech="MCAR")$amp
 mtcars_amp[,8] <- as.factor(mtcars_amp[,8])
 mtcars_amp[,9] <- as.factor(mtcars_amp[,9])
-str(mtcars_amp)
+summary(mtcars_amp) # przerzucic na osobny slajd
 ```
 
 ---
+
 ```{r, results='hide'}
 imp <- mice(mtcars_amp[,c(8,9)], method="logreg", m = 3, maxit = 3)
 ```
@@ -259,7 +264,8 @@ str(mtcars_amp)
 
 ## Zebranie wyników analiz
 
-- Funkcja pool
+- `pool`
+- co robi ...
 
 ```{r pool, results='hide'}
 temp <- mice(dutch_boys, m = 20, maxit = 5, seed = 123)
