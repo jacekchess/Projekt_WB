@@ -3133,21 +3133,33 @@ slide:not(.current) .plotly.html-widget{
 <p>Pakiet mice zawiera funkcje służące do:</p>
 
 <ul>
-<li>generowania symulowanych niekompletnych danych (ampute)</li>
-<li>sprawdzenia wzorca brakujących danych (md.pattern …)</li>
-<li>imputacji brakujących danych (wielokrotnie) (mice)</li>
-<li>diagnozowania jakości imputowanych wartości (jakie funkcje?)</li>
-<li>analizy każdego uzupełnionego zbioru danych (?)</li>
-<li>zebrania wyników powtarzanych analiz (-&gt; pool)</li>
-<li>przechowywania i eksportowania imputowanych danych w różnych formatach (?)</li>
+<li>generowania symulowanych niekompletnych danych</li>
+<li>sprawdzenia wzorca brakujących danych</li>
+<li>imputacji brakujących danych (wielokrotnie)</li>
+<li>diagnozowania jakości imputowanych wartości<br/></li>
+<li>analizy każdego uzupełnionego zbioru danych</li>
+<li>zebrania wyników powtarzanych analiz</li>
+<li>przechowywania i eksportowania imputowanych danych w różnych formatach</li>
 </ul>
 
 </article></slide><slide class=""><hgroup><h2>Zbiory danych dostępne w pakiecie mice</h2></hgroup><article  id="zbiory-danych-dostępne-w-pakiecie-mice">
 
 <ul>
-<li>boys (wzrost, waga, wiek … duńskich chłopców)</li>
-<li>brandsma (dane o uczniach z różnych szkół)</li>
-<li>pattern1,2,3,4 (proste zbiory danych z różnymi wzorcami braków danych)</li>
+<li><code>boys</code>
+
+<ul>
+<li>wzrost, waga, wiek … duńskich chłopców</li>
+</ul></li>
+<li><code>brandsma</code>
+
+<ul>
+<li>dane o uczniach z różnych szkół</li>
+</ul></li>
+<li><code>pattern1,2,3,4</code>
+
+<ul>
+<li>proste zbiory danych z różnymi wzorcami braków danych</li>
+</ul></li>
 </ul>
 
 </article></slide><slide class=""><hgroup><h2>Generowanie braków danych</h2></hgroup><article  id="generowanie-braków-danych">
@@ -3177,7 +3189,7 @@ slide:not(.current) .plotly.html-widget{
 <li><code>bwplot</code>
 
 <ul>
-<li>boxploty …</li>
+<li>boxploty danych amputowanych i nieamputowanych</li>
 </ul></li>
 <li><code>md.pattern</code>
 
@@ -3230,10 +3242,17 @@ slide:not(.current) .plotly.html-widget{
 
 </article></slide><slide class="segue dark nobackground level1"><hgroup class = 'auto-fadein'><h2>Imputacja danych</h2></hgroup><article  id="imputacja-danych">
 
-</article></slide><slide class=""><hgroup><h2>Zbiór danych boys</h2></hgroup><article  id="zbiór-danych-boys">
+</article></slide><slide class=""><hgroup><h2>Zbiór danych boys</h2></hgroup><article  class="smaller" id="zbiór-danych-boys">
 
-<pre class = 'prettyprint lang-r'># zajmujemy sie boys bo maja ordered/unordered factor -  nie mają binarnej kolumny - to nw, najwyżej inny zbiór danych?
-str(boys)</pre>
+<p>Zbiór zawiera już braki danych, ma kolumny:</p>
+
+<ul>
+<li>numeryczne</li>
+<li>kategoryczne uporządkowane</li>
+<li>kategoryczne nieuporządkowane</li>
+</ul>
+
+<pre class = 'prettyprint lang-r'>str(boys)</pre>
 
 <pre >## &#39;data.frame&#39;:    748 obs. of  9 variables:
 ##  $ age: num  0.035 0.038 0.057 0.06 0.062 0.068 0.068 0.071 0.071 0.073 ...
@@ -3245,16 +3264,6 @@ str(boys)</pre>
 ##  $ phb: Ord.factor w/ 6 levels &quot;P1&quot;&lt;&quot;P2&quot;&lt;&quot;P3&quot;&lt;..: NA NA NA NA NA NA NA NA NA NA ...
 ##  $ tv : int  NA NA NA NA NA NA NA NA NA NA ...
 ##  $ reg: Factor w/ 5 levels &quot;north&quot;,&quot;east&quot;,..: 4 4 4 4 4 4 4 3 3 2 ...</pre>
-
-</article></slide><slide class=""><hgroup><h2></h2></hgroup><article >
-
-<p>Zbiór zawiera już braki danych, ma kolumny:</p>
-
-<ul>
-<li>numeryczne</li>
-<li>kategoryczne uporządkowane</li>
-<li>kategoryczne nieuporządkowane</li>
-</ul>
 
 </article></slide><slide class=""><hgroup><h2>Funkcja mice</h2></hgroup><article  id="funkcja-mice">
 
@@ -3386,7 +3395,7 @@ dutch_boys &lt;- complete(imp)</pre>
                    mech=&quot;MCAR&quot;)$amp
 mtcars_amp[,8] &lt;- as.factor(mtcars_amp[,8])
 mtcars_amp[,9] &lt;- as.factor(mtcars_amp[,9])
-kable(summary(mtcars_amp) )# przerzucic na osobny slajd</pre>
+kable(summary(mtcars_amp) )</pre>
 
 <table class = 'rmdtable'>
 <tr class="header">
@@ -3509,11 +3518,19 @@ str(mtcars_amp)</pre>
 ##  $ gear: num  4 4 4 3 3 3 3 4 4 4 ...
 ##  $ carb: num  4 4 1 1 2 1 4 2 2 4 ...</pre>
 
-</article></slide><slide class=""><hgroup><h2>Zebranie wyników analiz</h2></hgroup><article  id="zebranie-wyników-analiz">
+</article></slide><slide class=""><hgroup><h2>Zebranie wyników analiz</h2></hgroup><article  class="smaller" id="zebranie-wyników-analiz">
 
 <ul>
-<li><code>pool</code></li>
-<li>co robi …</li>
+<li><code>pool</code>
+
+<ul>
+<li>zebranie wyników wielokrotnej imputacji</li>
+</ul></li>
+<li><code>with</code>
+
+<ul>
+<li>dopasowanie modelu do każdego imputowanego zbioru</li>
+</ul></li>
 </ul>
 
 <pre class = 'prettyprint lang-r'>temp &lt;- mice(dutch_boys, m = 20, maxit = 5, seed = 123)

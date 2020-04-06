@@ -23,20 +23,23 @@ MICE - Multivariate Imputation by Chained Equations
 
 Pakiet mice zawiera funkcje służące do:
 
-- generowania symulowanych niekompletnych danych (ampute)
-- sprawdzenia wzorca brakujących danych (md.pattern ...)
-- imputacji brakujących danych (wielokrotnie) (mice)
-- diagnozowania jakości imputowanych wartości (jakie funkcje?) 
-- analizy każdego uzupełnionego zbioru danych (?)
-- zebrania wyników powtarzanych analiz (-> pool)
-- przechowywania i eksportowania imputowanych danych w różnych formatach (?)
+- generowania symulowanych niekompletnych danych 
+- sprawdzenia wzorca brakujących danych
+- imputacji brakujących danych (wielokrotnie)
+- diagnozowania jakości imputowanych wartości  
+- analizy każdego uzupełnionego zbioru danych 
+- zebrania wyników powtarzanych analiz
+- przechowywania i eksportowania imputowanych danych w różnych formatach
 
 
 ## Zbiory danych dostępne w pakiecie mice
 
-- boys (wzrost, waga, wiek ... duńskich chłopców)
-- brandsma (dane o uczniach z różnych szkół)
-- pattern1,2,3,4 (proste zbiory danych z różnymi wzorcami braków danych)
+- `boys` 
+  - wzrost, waga, wiek ... duńskich chłopców
+- `brandsma` 
+  - dane o uczniach z różnych szkół
+- `pattern1,2,3,4 `
+  - proste zbiory danych z różnymi wzorcami braków danych
 
 
 ## Generowanie braków danych
@@ -68,7 +71,7 @@ iris_amp <- ampute(iris[,-5], prop = 0.5, mech = "MCAR")
 Więkoszość metod do rysowania wykresów nadpisuje funkcje z pakietu `lattice`.
 
 - `bwplot` 
-  - boxploty ...
+  - boxploty danych amputowanych i nieamputowanych
 - `md.pattern`
   - wyświetlenie wzorca brakujących danych w formie wykresu (oraz tabeli - w konsoli)
 - `fluxplot` 
@@ -110,15 +113,7 @@ fluxplot(iris_amp$amp)
 
 # Imputacja danych
 
-## Zbiór danych boys
-
-
-```{r info, fig.height=3,fig.width=6}
-# zajmujemy sie boys bo maja ordered/unordered factor -  nie mają binarnej kolumny - to nw, najwyżej inny zbiór danych?
-str(boys)
-```
-
----
+## Zbiór danych boys {.smaller}
 
 Zbiór zawiera już braki danych, ma kolumny:
 
@@ -126,6 +121,13 @@ Zbiór zawiera już braki danych, ma kolumny:
  - kategoryczne uporządkowane
  - kategoryczne nieuporządkowane
 
+```{r comm, echo=FALSE}
+# zajmujemy sie boys bo maja ordered/unordered factor -  nie mają binarnej kolumny - to nw, najwyżej inny zbiór danych?
+
+```
+```{r info, fig.height=3,fig.width=6}
+str(boys)
+```
 
 ## Funkcja mice 
 
@@ -233,7 +235,7 @@ xyplot(imp,reg ~ hgt+wgt,
 - logreg (logistic regression/regresja logistyczna) (domyślna)
 - logreg.boot  (logistic regression with bootstrap)
 
----
+---  
 
 ```{r comment, echo=FALSE}
 # Ponieważ w zbiorze danych boys nie ma danych binarnych,
@@ -249,7 +251,7 @@ mtcars_amp<-ampute(data=mtcars,
                    mech="MCAR")$amp
 mtcars_amp[,8] <- as.factor(mtcars_amp[,8])
 mtcars_amp[,9] <- as.factor(mtcars_amp[,9])
-kable(summary(mtcars_amp) )# przerzucic na osobny slajd
+kable(summary(mtcars_amp) )
 ```
 
 ---
@@ -262,10 +264,13 @@ mtcars_amp[,c(8,9)] <- complete(imp)
 str(mtcars_amp)
 ```
 
-## Zebranie wyników analiz
+## Zebranie wyników analiz {.smaller}
 
 - `pool`
-- co robi ...
+  - zebranie wyników wielokrotnej imputacji
+
+- `with`
+  - dopasowanie modelu do każdego imputowanego zbioru
 
 ```{r pool, results='hide'}
 temp <- mice(dutch_boys, m = 20, maxit = 5, seed = 123)
