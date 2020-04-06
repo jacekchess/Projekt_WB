@@ -139,21 +139,6 @@ fluxplot(iris_amp$amp)
 
 # Imputacja danych
 
-## Zbiór danych boys {.smaller}
-
-Zbiór zawiera już braki danych, ma kolumny:
-
- - numeryczne
- - kategoryczne uporządkowane
- - kategoryczne nieuporządkowane
-
-```{r comm, echo=FALSE}
-# zajmujemy sie boys bo maja ordered/unordered factor -  nie mają binarnej kolumny - to nw, najwyżej inny zbiór danych?
-
-```
-```{r info, fig.height=3,fig.width=6}
-str(boys)
-```
 
 ## Funkcja `mice` {.smaller}
 
@@ -187,7 +172,7 @@ imp
 
 ## Parametr `defaultMathod`
 
-Parametr `defautMethod`funkcji mice określa domyślne metody stosowane dla poszczególnych typów danych, jeśli nie wskażemy jej wprost. Domyślnie jest to wektor:
+Parametr `defautMethod` funkcji mice określa domyślne metody stosowane dla poszczególnych typów danych, jeśli nie wskażemy jej wprost. Domyślnie jest to wektor:
 
 defaultMethod = c("pmm", "logreg", "polyreg", "polr")
  
@@ -232,21 +217,37 @@ X - zbiór predykatorów (inne zmienne)
 2. Wybieramy losowo z 'posterior predictive distribution' - rozkładu możliwych niezaobserwowanych wartości Y w zależności od zaobserowanych i tworzymy nowy zbiór współczynników.
 3. Obliczamy osobno wartości dla zaobserowanych i brakujących Y
 4. Dla każdej brakującej wartości Y, znajdujemy najbliższe (najczęściej 3) sprośród wartości dla zaobserowanych Y.
-5. wybieramy z nich jedną - losowo.
+5. Wybieramy z nich jedną - losowo.
 
 Bardzo dobre wyjaśnienie z przykładami w R:
 
 https://statisticsglobe.com/predictive-mean-matching-imputation-method/?fbclid=IwAR04-2KA9LtMObQj062QRjgbDXIpGdgHWR-gmTMmIwLrVDITwjzSVuArK1c
 
+## Zbiór danych boys {.smaller}
+
+Zbiór zawiera już braki danych, ma kolumny:
+
+ - numeryczne
+ - kategoryczne uporządkowane
+ - kategoryczne nieuporządkowane
+
+```{r comm, echo=FALSE}
+# zajmujemy sie boys bo maja ordered/unordered factor -  nie mają binarnej kolumny - do zaprezentowania imputacji na binarnej użyjemy innego zbioru 
+
+```
+```{r info, fig.height=3,fig.width=6}
+visdat::vis_dat(boys)
+```
+
 ---
 
-```{r num}
+Zaimputujemy kolumny numeryczne: 1,2,3,4,5 i 8
+
+```{r num, results='hide'}
 dutch_boys<-boys
-imp <- mice(dutch_boys[,-c(6,7,9)],
+imp <- mice(dutch_boys[,c(1,2,3,4,5,8)],
             method="pmm", m=3, maxit=3)
-```
-```{r}
-dutch_boys[,-c(6,7,9)] <- complete(imp)
+dutch_boys[,c(1,2,3,4,5,8)] <- complete(imp)
 ```
 
 
@@ -272,8 +273,7 @@ densityplot(imp)
 stripplot(imp,col=c("grey",mdc(2)),pch=c(1,20))
 ```
 
-
-## Nieuporządkowane dane kategoryczne
+## Nieporządkowane dane kategoryczne
 
 - polyreg (Polytomous logistic regression) - domyślna
 - lda - liniowa analiza dyskryminacyjna
@@ -287,17 +287,19 @@ https://en.wikipedia.org/wiki/Multinomial_logistic_regression
 
 ---
 
+Pozostała zmienna kategoryczna factor w kolumnie 9 (omijamy kolumny 6,7 innego typu, w których są jeszcze braki).
+
 ```{r lda, results='hide'}
-imp <- mice(dutch_boys[,-9], method="polyreg", m=3, maxit=3)
-dutch_boys[,-9] <- complete(imp)
+imp <- mice(dutch_boys[,-c(6,7)], method="polyreg", m=3, maxit=3)
+dutch_boys[,-c(6,7)] <- complete(imp)
 ```
 
 ---
-
 ```{r}
-xyplot(imp, gen+phb ~ hgt+wgt,
-       cex=1,col=c("grey",mdc(2)),pch=c(1,20))
+xyplot(imp,reg ~ hgt+wgt,
+       cex=3,col=c("grey",mdc(2)),pch=20)
 ```
+
 
 ## Uporządkowane dane kategoryczne {.smaller}
 
@@ -318,6 +320,8 @@ Więcej informacji: https://en.wikipedia.org/wiki/Ordered_logit
 
 ---
 
+Dane kategoryczne uporządkowane znajdują się w kolumnach 6 i 7, ale wszystkie pozostałe kolumny są już uzupełnione.
+
 ```{r polr, results='hide'}
 imp <- mice(dutch_boys, method="polr", m=3, maxit=3)
 dutch_boys <- complete(imp)
@@ -326,9 +330,10 @@ dutch_boys <- complete(imp)
 ---
 
 ```{r}
-xyplot(imp,reg ~ hgt+wgt,
-       cex=3,col=c("grey",mdc(2)),pch=20)
+xyplot(imp, gen+phb ~ hgt+wgt,
+       cex=1,col=c("grey",mdc(2)),pch=c(1,20))
 ```
+
 
 ## Dane binarne
 
@@ -349,7 +354,7 @@ $logit(p)=ln(\frac{p}{1-p})$
 
 Więcej informacji: https://pl.wikipedia.org/wiki/Regresja_logistyczna
 
----  
+--- 
 
 ```{r comment, echo=FALSE}
 # Ponieważ w zbiorze danych boys nie ma danych binarnych,
@@ -395,6 +400,7 @@ str(mtcars_amp)
 
 
 ```{r pool, results='hide'}
+dutch_boys<-boys
 temp <- mice(dutch_boys, m = 20, maxit = 5, seed = 123)
 modelFit <- with(data=temp, 
                  expr=lm(age ~ hgt + wgt))
