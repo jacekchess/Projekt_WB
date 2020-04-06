@@ -33,11 +33,15 @@ Pakiet mice zawiera funkcje służące do:
 
 ## Główne funkcje
 
-`ampute()`	Generowanie braków danych
-`mice()`	Imputacja brakujących danych *m* razy
-`complete()`	Eksport imputowanych danych
-`with()`	Analiza uzupełnionych zbiorów danych
-`pool()`	Łączenie szacowanych parametrów
+ - `ampute()`	Generowanie braków danych
+
+ - `mice()`	Imputacja brakujących danych *m* razy
+
+ - `complete()`	Eksport imputowanych danych
+
+ - `with()`	Analiza uzupełnionych zbiorów danych
+
+ - `pool()`	Łączenie szacowanych parametrów
 
 
 
@@ -143,20 +147,27 @@ Zbiór zawiera już braki danych, ma kolumny:
 str(boys)
 ```
 
-## Funkcja mice 
+## Funkcja `mice`
 
 Najważniejsze parametry:
+
  - data - zbiór danych zawierający braki
- - liczba imputacji (domyślnie 5)
+ 
+ - m - liczba imputacji (domyślnie 5)
+ 
  - method - metoda imputacji
+ 
  - predictorMatix - pozwala wskazać których kolumn użyć przy przewidywaniu wartości w danej kolumnie
+ 
  - where - macierz binarna wskazująca gdzie imputować (domyślnie is.na(data))
+ 
  - defaultMethod - określa domyślne metody stosowane dla poszczególnych typów danych
- -maxit - liczba iteracji (domyślnie 5)
+ 
+ - maxit - liczba iteracji (domyślnie 5)
 
 ---
 
-### Klasa `mids` - Multiply imputed data set
+## Klasa `mids` - multiply imputed data set
 
 ```{r}
 imp<-mice(boys)
@@ -188,7 +199,7 @@ Niektóre metody imputacji możemy zastosować do każdego typu danych.
 - midastouch (weighted predictive mean matching) 
 - sample - losowa próbka
 - cart (classification and regression trees) - drzewa klasyfikacyjne/regresji 
-- rf (random forest) -lasy losowe
+- rf (random forest) - lasy losowe
 
 ## Dane numeryczne 
 
@@ -200,24 +211,20 @@ Niektóre metody imputacji możemy zastosować do każdego typu danych.
   - norm.predict (linear regression, predicted values)
 - quadratic (imputation of quadratic terms)
 - ri (random indicator for nonignorable data)
----
 
 ## Predictive Mean Matching
-
 Y - imputowana zmienna
 X - zbiór predykatorów (inne zmienne)
 
 1. Regresja liniowa (używamy tylko zaobserwowanych wartości X i Y)
-
 2. Wybieramy losowo z 'posterior predictive distribution' - rozkładu możliwych niezaobserwowanych wartości Y w zależności od zaobserowanych i tworzymy nowy zbiór współczynników.
- 
 3. Obliczamy osobno wartości dla zaobserowanych i brakujących Y
-
 4. Dla każdej brakującej wartości Y, znajdujemy najbliższe (najczęściej 3) sprośród wartości dla zaobserowanych Y.
-
 5. wybieramy z nich jedną - losowo.
 
-Bardzo dobre wyjaśnienie z przykładami w R: https://statisticsglobe.com/predictive-mean-matching-imputation-method/?fbclid=IwAR04-2KA9LtMObQj062QRjgbDXIpGdgHWR-gmTMmIwLrVDITwjzSVuArK1c
+Bardzo dobre wyjaśnienie z przykładami w R:
+https://statisticsglobe.com/predictive-mean-matching-imputation-method/?fbclid=IwAR04-2KA9LtMObQj062QRjgbDXIpGdgHWR-gmTMmIwLrVDITwjzSVuArK1c
+
 ---
 
 ```{r num}
@@ -255,12 +262,20 @@ stripplot(imp,col=c("grey",mdc(2)),pch=c(1,20))
 
 ## Nieuporządkowane dane kategoryczne
 
-- polyreg (Polytomous logistic regression) (domyślna)
-- lda (liniowa analiza dyskryminacyjna)
+- polyreg (Polytomous logistic regression) - domyślna
+- lda - liniowa analiza dyskryminacyjna
 
+## Polyreg
+
+Ugólnienie regresji logistycznej dla zamiennych o więcej niż 2 poziomach.
+
+Więcej informacji:
+https://en.wikipedia.org/wiki/Multinomial_logistic_regression
+
+---
 
 ```{r lda, results='hide'}
-imp <- mice(dutch_boys[,-9], method="lda", m=3, maxit=3)
+imp <- mice(dutch_boys[,-9], method="polyreg", m=3, maxit=3)
 dutch_boys[,-9] <- complete(imp)
 ```
 
@@ -273,7 +288,22 @@ xyplot(imp, gen+phb ~ hgt+wgt,
 
 ## Uporządkowane dane kategoryczne
 
-- polr (Proportional odds model) (domyślna)
+- polr (Proportional odds model) - domyślna
+
+Model regresji dla danych kategorycznych uporządkowanych, opierający się na logarytmach odpowiednich proporacji.
+Np jeśli zmienna ma poziomy zły < średni < dobry < bardzo dobry, mające liczność odpowiednio $p_1$,$p_2$,$p_3$,$p_4$.
+
+Logarytmy szansy, że ktoś odpowie w dany sposób wynosi:
+
+zły - $log(\frac{p_1}{p_2+p_3+p_4})$
+
+zły lub średni - $log(\frac{p_1+p_2}{p_3+p_4})$
+
+zły, średni lub dobry - $log(\frac{p_1+p_2+P_3}{p_4})$
+
+Więcej informacji: https://en.wikipedia.org/wiki/Ordered_logit
+
+---
 
 ```{r polr, results='hide'}
 imp <- mice(dutch_boys, method="polr", m=3, maxit=3)
@@ -289,8 +319,20 @@ xyplot(imp,reg ~ hgt+wgt,
 
 ## Dane binarne
 
-- logreg (logistic regression/regresja logistyczna) (domyślna)
+- logreg (logistic regression) - regresja logistyczna, domyślna
 - logreg.boot  (logistic regression with bootstrap)
+
+
+## Logistic Regression
+
+Stosowana, gdy zmienna ma tylko dwie kategorie, pozwala na obliczanie prawdopodobieństwa, że obserwacja należy do jednej z nich.
+Formalnie model regresji logistycznej jest uogólnionym modelem liniowym, w którym jako funkcji wiążącej używa się funkcji logit:
+
+$logit(p)=ln(\frac{p}{1-p})$
+
+---
+![](logistic.jpeg)
+Więcej informacji: https://pl.wikipedia.org/wiki/Regresja_logistyczna
 
 ---  
 
@@ -308,6 +350,11 @@ mtcars_amp<-ampute(data=mtcars,
                    mech="MCAR")$amp
 mtcars_amp[,8] <- as.factor(mtcars_amp[,8])
 mtcars_amp[,9] <- as.factor(mtcars_amp[,9])
+```
+
+---
+
+```{r}
 kable(summary(mtcars_amp) )
 ```
 
@@ -336,8 +383,15 @@ str(mtcars_amp)
 temp <- mice(dutch_boys, m = 20, maxit = 5, seed = 123)
 modelFit <- with(data=temp, 
                  expr=lm(age ~ hgt + wgt))
-summary(modelFit)
 ```
+
+---
+```{r}
+kable(summary(modelFit))
+```
+
+--- 
+
 ```{r}
 kable(summary(pool(modelFit)))
 ```
