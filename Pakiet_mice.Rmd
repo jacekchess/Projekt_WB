@@ -4,7 +4,7 @@ author: "Martyna Majchrzak, Agata Makarewicz, Jacek Wiśniewski"
 date: "26 03 2020"
 header-includes:
 - \titlegraphic{\centering \includegraphics[width=5cm]{mouse_emoji.png}}
-output: beamer_presentation
+output: ioslides_presentation
 
 ---
 
@@ -249,7 +249,7 @@ mtcars_amp<-ampute(data=mtcars,
                    mech="MCAR")$amp
 mtcars_amp[,8] <- as.factor(mtcars_amp[,8])
 mtcars_amp[,9] <- as.factor(mtcars_amp[,9])
-summary(mtcars_amp) # przerzucic na osobny slajd
+kable(summary(mtcars_amp) )# przerzucic na osobny slajd
 ```
 
 ---
@@ -272,5 +272,5 @@ temp <- mice(dutch_boys, m = 20, maxit = 5, seed = 123)
 modelFit <- with(temp, lm(age ~ hgt + wgt))
 ```
 ```{r}
-summary(pool(modelFit))
+kable(summary(pool(modelFit)))
 ```
