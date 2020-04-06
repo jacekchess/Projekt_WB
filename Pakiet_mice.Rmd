@@ -147,10 +147,12 @@ str(boys)
 
 Najważniejsze parametry:
  - data - zbiór danych zawierający braki
+ - liczba imputacji (domyślnie 5)
  - method - metoda imputacji
  - predictorMatix - pozwala wskazać których kolumn użyć przy przewidywaniu wartości w danej kolumnie
  - where - macierz binarna wskazująca gdzie imputować (domyślnie is.na(data))
  - defaultMethod - określa domyślne metody stosowane dla poszczególnych typów danych
+ -maxit - liczba iteracji (domyślnie 5)
 
 
 ### Parametr `method`
@@ -167,12 +169,11 @@ Dane podzielone są na 4 kategorie:
 
 Niektóre metody imputacji możemy zastosować do każdego typu danych.
 
-- pmm (predictive mean matching/predykcyjne dopasowanie średniej)
-- midastouch (weighted predictive mean matching/ ?)
-- sample (losowa próbka)
-- cart (drzewo klasyfikacyjne i regresji (?))
-- rf (random forest/lasy losowe)
-- 2lonly.pmm (Level-2 class predictive mean matching) <- ?
+- pmm (predictive mean matching) - predykcyjne dopasowanie średniej
+- midastouch (weighted predictive mean matching) 
+- sample - losowa próbka
+- cart (classification and regression trees) - drzewa klasyfikacyjne/regresji 
+- rf (random forest) -lasy losowe
 
 ## Dane numeryczne 
 
@@ -288,7 +289,7 @@ mtcars_amp[,c(8,9)] <- complete(imp)
 str(mtcars_amp)
 ```
 
-## Domyślne metody
+## Parametr `defaultMathod`
 
 Parametr `defautMethod`funkcji mice określa domyślne metody stosowane dla poszczególnych typów danych, jeśli nie wskażemy jej wprost. Domyślnie jest to wektor:
 
@@ -299,17 +300,30 @@ defaultMethod = c("pmm", "logreg", "polyreg", "polr")
  - polyreg - nieuporządkowane dane kategoryczne
  - polr - uporządkowane dane kategoryczne
  
+---
+
+Zmieniając go możemy wykonać jednocześnie imputację na kolumnach różnego typu
+
+```{r}
+
+
+```
+ 
 ## Zebranie wyników analiz {.smaller}
+
+
+- `with`
+  - dopasowanie modelu do każdego imputowanego zbioru na podstawie formuły
 
 - `pool`
   - zebranie wyników wielokrotnej imputacji
 
-- `with`
-  - dopasowanie modelu do każdego imputowanego zbioru
 
 ```{r pool, results='hide'}
 temp <- mice(dutch_boys, m = 20, maxit = 5, seed = 123)
-modelFit <- with(temp, lm(age ~ hgt + wgt))
+modelFit <- with(data=temp, 
+                 expr=lm(age ~ hgt + wgt))
+summary(modelFit)
 ```
 ```{r}
 kable(summary(pool(modelFit)))
