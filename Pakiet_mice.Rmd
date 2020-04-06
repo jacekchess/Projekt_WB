@@ -273,7 +273,7 @@ densityplot(imp)
 stripplot(imp,col=c("grey",mdc(2)),pch=c(1,20))
 ```
 
-## Nieporządkowane dane kategoryczne
+## Nieuporządkowane dane kategoryczne
 
 - polyreg (Polytomous logistic regression) - domyślna
 - lda - liniowa analiza dyskryminacyjna

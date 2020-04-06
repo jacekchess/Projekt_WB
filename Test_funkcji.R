@@ -71,11 +71,11 @@ imp1 <- mice(dutch_boys_2[,-c(6,7,9)],
 
 dutch_boys_2[,-c(6,7,9)] <- complete(imp1)
  
-# teraz kolumny 6,7 czyli nieuporządkowane dane kategoryczne
-imp2 <- mice(dutch_boys_2[,-9], method="lda", m=3, maxit=3)
-dutch_boys_2[,-9] <- complete(imp2)
+# teraz kolumna 9 czyli nieuporządkowane dane kategoryczne
+imp2 <- mice(dutch_boys_2[,-c(6,7)], method="polyreg", m=3, maxit=3)
+dutch_boys_2[,-c(6,7)] <- complete(imp2)
 
-# i na koniec pozostała kolumna (uporządkowane kategoryczne)
+# i na koniec kolumny 6 i 7 (uporządkowane kategoryczne)
 imp3 <- mice(dutch_boys_2, method="polr", m=3, maxit=3)
 dutch_boys_2 <- complete(imp3)
 
@@ -89,7 +89,7 @@ densityplot(imp1) # tylko dla danych ciągłych !!!
 # czerwone - dane imputowane
 stripplot(imp1,col=c("grey",mdc(2)),pch=c(1,20))
 
-xyplot(imp2, gen+phb ~ hgt+wgt,
+xyplot(imp3, gen+phb ~ hgt+wgt,
        cex=1,col=c("grey",mdc(2)),pch=c(1,20))
 
 ## Zebranie wyników analiz 
@@ -97,7 +97,7 @@ xyplot(imp2, gen+phb ~ hgt+wgt,
 dutch_boys <- boys
 
 # imputacja
-temp <- mice(dutch_boys, m = 20, maxit = 5, seed = 123)
+temp <- mice(dutch_boys, m = 10, maxit = 5, seed = 123)
 
 # dopasowanie modelu lm 
 modelFit <- with(data=temp, 
