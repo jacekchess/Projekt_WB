@@ -31,6 +31,15 @@ Pakiet mice zawiera funkcje służące do:
 - zebrania wyników powtarzanych analiz
 - przechowywania i eksportowania imputowanych danych w różnych formatach
 
+## Główne funkcje
+
+`ampute()`	Generowanie braków danych
+`mice()`	Imputacja brakujących danych *m* razy
+`complete()`	Eksport imputowanych danych
+`with()`	Analiza uzupełnionych zbiorów danych
+`pool()`	Łączenie szacowanych parametrów
+
+
 
 ## Zbiory danych dostępne w pakiecie mice
 
@@ -48,9 +57,14 @@ Pakiet mice zawiera funkcje służące do:
 - generowanie brakujących danych potrzebnych do symulacji
   - określony procent danych zostaje zastąpiony NA 
     (obserwacje są wybierane losowo)
-  - różne mechanizmy: MAR (Missing At Random), 
-                      MCAR (Missing Completely At Random), 
-                      MNAR (Missing Not At Random)
+  - różne mechanizmy: 
+  
+                    MAR (Missing At Random), 
+                      
+                    MCAR (Missing Completely At Random), 
+                
+                    MNAR (Missing Not At Random)
+                    
   - określenie wzorca braków danych oraz częstotliwości 
     jego wystąpienia
 
@@ -102,7 +116,7 @@ Dla każdej zmiennej obliczane są 2 wartości:
 
  - Influx - liczba par zmiennych takich, że w danej jest brak a w drugiej nie, podzielona przez wszystkie obserwacje. Dane pełne: 0, Dane całkowicie brakujące:1
 
- - Outflux - liczba par zmiennych takich, że w danej jest obserwacja a w drugiej brak, podzielona przez wszystkie obserwacje. Dane pełne: 1, Dane całkowicie brakujące:0. Potencjalna użytecznośc do imputowania innych zmiennych.
+ - Outflux - liczba par zmiennych takich, że w danej jest obserwacja a w drugiej brak, podzielona przez wszystkie obserwacje. Dane pełne: 1, Dane całkowicie brakujące:0. Potencjalna użyteczność do imputowania innych zmiennych.
 
 ---
 
@@ -130,6 +144,16 @@ str(boys)
 ```
 
 ## Funkcja mice 
+
+Najważniejsze parametry:
+ - data - zbiór danych zawierający braki
+ - method - metoda imputacji
+ - predictorMatix - pozwala wskazać których kolumn użyć przy przewidywaniu wartości w danej kolumnie
+ - where - macierz binarna wskazująca gdzie imputować (domyślnie is.na(data))
+ - defaultMethod - określa domyślne metody stosowane dla poszczególnych typów danych
+
+
+### Parametr `method`
 
 W zależności od typu brakujących danych, funkcja mice przyjmuje jako parametr inne metody imputacji danych.\
 Dane podzielone są na 4 kategorie:
@@ -264,6 +288,17 @@ mtcars_amp[,c(8,9)] <- complete(imp)
 str(mtcars_amp)
 ```
 
+## Domyślne metody
+
+Parametr `defautMethod`funkcji mice określa domyślne metody stosowane dla poszczególnych typów danych, jeśli nie wskażemy jej wprost. Domyślnie jest to wektor:
+
+defaultMethod = c("pmm", "logreg", "polyreg", "polr")
+
+ - pmm - dane numeryczne
+ - logreg - dane binarne
+ - polyreg - nieuporządkowane dane kategoryczne
+ - polr - uporządkowane dane kategoryczne
+ 
 ## Zebranie wyników analiz {.smaller}
 
 - `pool`
