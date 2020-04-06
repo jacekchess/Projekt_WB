@@ -154,8 +154,23 @@ Najważniejsze parametry:
  - defaultMethod - określa domyślne metody stosowane dla poszczególnych typów danych
  -maxit - liczba iteracji (domyślnie 5)
 
+---
 
-### Parametr `method`
+### Klasa `mids` - Multiply imputed data set
+
+```{r}
+imp<-mice(boys)
+imp
+```
+
+## Parametr `defaultMathod`
+
+Parametr `defautMethod`funkcji mice określa domyślne metody stosowane dla poszczególnych typów danych, jeśli nie wskażemy jej wprost. Domyślnie jest to wektor:
+
+defaultMethod = c("pmm", "logreg", "polyreg", "polr")
+ 
+
+## Parametr `method`
 
 W zależności od typu brakujących danych, funkcja mice przyjmuje jako parametr inne metody imputacji danych.\
 Dane podzielone są na 4 kategorie:
@@ -177,15 +192,32 @@ Niektóre metody imputacji możemy zastosować do każdego typu danych.
 
 ## Dane numeryczne 
 
-- pmm (domyślna)
-- mean (średnia)
+- pmm (predictive mean matching) - domyślna
+- mean - średnia
 - norm (Bayesian linear regression/regresja liniowa)
   - norm.nob (linear regression ignoring model error)
   - norm.boot (linear regression using bootstrap)
   - norm.predict (linear regression, predicted values)
 - quadratic (imputation of quadratic terms)
 - ri (random indicator for nonignorable data)
+---
 
+## Predictive Mean Matching
+
+Y - imputowana zmienna
+X - zbiór predykatorów (inne zmienne)
+
+1. Regresja liniowa (używamy tylko zaobserwowanych wartości X i Y)
+
+2. Wybieramy losowo z 'posterior predictive distribution' - rozkładu możliwych niezaobserwowanych wartości Y w zależności od zaobserowanych i tworzymy nowy zbiór współczynników.
+ 
+3. Obliczamy osobno wartości dla zaobserowanych i brakujących Y
+
+4. Dla każdej brakującej wartości Y, znajdujemy najbliższe (najczęściej 3) sprośród wartości dla zaobserowanych Y.
+
+5. wybieramy z nich jedną - losowo.
+
+Bardzo dobre wyjaśnienie z przykładami w R: https://statisticsglobe.com/predictive-mean-matching-imputation-method/?fbclid=IwAR04-2KA9LtMObQj062QRjgbDXIpGdgHWR-gmTMmIwLrVDITwjzSVuArK1c
 ---
 
 ```{r num}
@@ -289,25 +321,6 @@ mtcars_amp[,c(8,9)] <- complete(imp)
 str(mtcars_amp)
 ```
 
-## Parametr `defaultMathod`
-
-Parametr `defautMethod`funkcji mice określa domyślne metody stosowane dla poszczególnych typów danych, jeśli nie wskażemy jej wprost. Domyślnie jest to wektor:
-
-defaultMethod = c("pmm", "logreg", "polyreg", "polr")
-
- - pmm - dane numeryczne
- - logreg - dane binarne
- - polyreg - nieuporządkowane dane kategoryczne
- - polr - uporządkowane dane kategoryczne
- 
----
-
-Zmieniając go możemy wykonać jednocześnie imputację na kolumnach różnego typu
-
-```{r}
-
-
-```
  
 ## Zebranie wyników analiz {.smaller}
 
