@@ -118,9 +118,17 @@ md.pattern(iris_amp$amp, plot = TRUE, rotate.names = TRUE)
 
 Dla każdej zmiennej obliczane są 2 wartości:
 
- - Influx - liczba par zmiennych takich, że w danej jest brak a w drugiej nie, podzielona przez wszystkie obserwacje. Dane pełne: 0, Dane całkowicie brakujące:1
+ - Influx - liczba par zmiennych takich, że w danej jest brak a w drugiej nie, podzielona przez wszystkie obserwacje. 
+ 
+ Dane pełne: 0
+ 
+ Dane całkowicie brakujące: 1
 
- - Outflux - liczba par zmiennych takich, że w danej jest obserwacja a w drugiej brak, podzielona przez wszystkie obserwacje. Dane pełne: 1, Dane całkowicie brakujące:0. Potencjalna użyteczność do imputowania innych zmiennych.
+ - Outflux - liczba par zmiennych takich, że w danej jest obserwacja a w drugiej brak, podzielona przez wszystkie obserwacje. Potencjalna użyteczność do imputowania innych zmiennych.
+ 
+ Dane pełne: 1
+ 
+ Dane całkowicie brakujące: 0. 
 
 ---
 
@@ -151,26 +159,31 @@ str(boys)
 
 Najważniejsze parametry:
 
- - data - zbiór danych zawierający braki
+ - `data` - zbiór danych zawierający braki
  
- - m - liczba imputacji (domyślnie 5)
+ - `m` - liczba imputacji (domyślnie 5)
  
- - method - metoda imputacji
+ - `method` - metoda imputacji
  
- - predictorMatix - pozwala wskazać których kolumn użyć przy przewidywaniu wartości w danej kolumnie
+ - `predictorMatix` - pozwala wskazać których kolumn użyć przy przewidywaniu wartości w danej kolumnie
  
- - where - macierz binarna wskazująca gdzie imputować (domyślnie is.na(data))
+ - `where` - macierz binarna wskazująca gdzie imputować (domyślnie is.na(data))
  
- - defaultMethod - określa domyślne metody stosowane dla poszczególnych typów danych
+ - `defaultMethod` - określa domyślne metody stosowane dla poszczególnych typów danych
  
- - maxit - liczba iteracji (domyślnie 5)
+ - `maxit` - liczba iteracji (domyślnie 5)
 
+## Parametry `m` i `maxit`
+```{r}
+imp <- mice(boys, m=3, maxit=2)
+```
 
 ## Klasa `mids` - multiply imputed data set {.smaller}
 
 ```{r}
-imp <- mice(boys)
+imp
 ```
+
 
 ## Parametr `defaultMathod`
 
