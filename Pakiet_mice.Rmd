@@ -112,9 +112,7 @@ md.pattern(iris_amp$amp,plot = FALSE, rotate.names = TRUE)
 md.pattern(iris_amp$amp, plot = TRUE, rotate.names = TRUE)
 ```
 
----
-
-### Fluxplot
+## Fluxplot
 
 Dla każdej zmiennej obliczane są 2 wartości:
 
@@ -280,7 +278,7 @@ stripplot(imp,col=c("grey",mdc(2)),pch=c(1,20))
 
 ## Polyreg
 
-Ugólnienie regresji logistycznej dla zamiennych o więcej niż 2 poziomach.
+Ugólnienie regresji logistycznej dla zmiennych o więcej niż 2 poziomach.
 
 Więcej informacji:
 https://en.wikipedia.org/wiki/Multinomial_logistic_regression
