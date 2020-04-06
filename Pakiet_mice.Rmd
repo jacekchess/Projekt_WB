@@ -147,7 +147,7 @@ Zbiór zawiera już braki danych, ma kolumny:
 str(boys)
 ```
 
-## Funkcja `mice`
+## Funkcja `mice` {.smaller}
 
 Najważniejsze parametry:
 
@@ -165,13 +165,11 @@ Najważniejsze parametry:
  
  - maxit - liczba iteracji (domyślnie 5)
 
----
 
-## Klasa `mids` - multiply imputed data set
+## Klasa `mids` - multiply imputed data set {.smaller}
 
 ```{r}
-imp<-mice(boys)
-imp
+imp <- mice(boys)
 ```
 
 ## Parametr `defaultMathod`
@@ -212,7 +210,8 @@ Niektóre metody imputacji możemy zastosować do każdego typu danych.
 - quadratic (imputation of quadratic terms)
 - ri (random indicator for nonignorable data)
 
-## Predictive Mean Matching
+## Predictive Mean Matching {.smaller}
+
 Y - imputowana zmienna
 X - zbiór predykatorów (inne zmienne)
 
@@ -223,6 +222,7 @@ X - zbiór predykatorów (inne zmienne)
 5. wybieramy z nich jedną - losowo.
 
 Bardzo dobre wyjaśnienie z przykładami w R:
+
 https://statisticsglobe.com/predictive-mean-matching-imputation-method/?fbclid=IwAR04-2KA9LtMObQj062QRjgbDXIpGdgHWR-gmTMmIwLrVDITwjzSVuArK1c
 
 ---
@@ -286,7 +286,7 @@ xyplot(imp, gen+phb ~ hgt+wgt,
        cex=1,col=c("grey",mdc(2)),pch=c(1,20))
 ```
 
-## Uporządkowane dane kategoryczne
+## Uporządkowane dane kategoryczne {.smaller}
 
 - polr (Proportional odds model) - domyślna
 
@@ -331,7 +331,9 @@ Formalnie model regresji logistycznej jest uogólnionym modelem liniowym, w któ
 $logit(p)=ln(\frac{p}{1-p})$
 
 ---
+
 ![](logistic.jpeg)
+
 Więcej informacji: https://pl.wikipedia.org/wiki/Regresja_logistyczna
 
 ---  
@@ -352,7 +354,7 @@ mtcars_amp[,8] <- as.factor(mtcars_amp[,8])
 mtcars_amp[,9] <- as.factor(mtcars_amp[,9])
 ```
 
----
+## {.smaller}
 
 ```{r}
 kable(summary(mtcars_amp) )
@@ -369,7 +371,7 @@ str(mtcars_amp)
 ```
 
  
-## Zebranie wyników analiz {.smaller}
+## Zebranie wyników analiz
 
 
 - `with`
@@ -385,12 +387,13 @@ modelFit <- with(data=temp,
                  expr=lm(age ~ hgt + wgt))
 ```
 
----
+## {.smaller}
+
 ```{r}
 kable(summary(modelFit))
 ```
 
---- 
+## {.smaller}
 
 ```{r}
 kable(summary(pool(modelFit)))
