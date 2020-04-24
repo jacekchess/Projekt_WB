@@ -9,6 +9,8 @@ library(OpenML)
 # data <- boys
 data <- getOMLDataSet(55L)
 data <- data$data
+data[,20] <- as.factor(ifelse(data[,20] == "DIE", 1, 0))
+target <- "Class"
 
 # data[, 9] <- as.factor(ifelse(data[, 9] == "west", 0, 1))
 # target <- "reg"
@@ -31,8 +33,8 @@ evaluate_imputation <- function(data, target) {
   ## Imputacja
   
   # Ramka bez kolumn zawierajacych NA
-  data_train_rm_cols <- data_train %>% select_if(~ !any(is.na(.)))
-  data_test_rm_cols <- data_test  %>% select_if(~ !any(is.na(.)))
+  # data_train_rm_cols <- data_train %>% select_if(~ !any(is.na(.)))
+  # data_test_rm_cols <- data_test  %>% select_if(~ !any(is.na(.)))
 
   # Ramka bez wierszy zawierajacych NA
   data_train_rm_rows <- na.omit(data_train)
@@ -74,9 +76,9 @@ evaluate_imputation <- function(data, target) {
   
   # imputacja missForest
   missForest_train_imp <- missForest(data_train) # zwraca liste
-  data_missForest <- missForest_train_imp$ximp
+  data_train_missForest <- missForest_train_imp$ximp
   missForest_test_imp <- missForest(data_test) # zwraca liste
-  data_missForest <- missForest_test_imp$ximp
+  data_test_missForest <- missForest_test_imp$ximp
   
   ## imputacja Amelia ? 
   
@@ -87,16 +89,25 @@ evaluate_imputation <- function(data, target) {
   
   ## Model gbm
   
-  # data_rm_rows
-  # 
-  # n <- sample(1:nrow(data_rm_rows), 0.7* nrow(data_rm_rows))
-  # data_train <- data_rm_rows[n,]
-  # data_test <- data_rm_rows[-n,]
-  # 
-  # task <- makeClassifTask(data = data_train, target = target)
-  # learner <- makeLearner("classif.gbm", predict.type = "prob")
-  # model <- train(learner, task)
-  # 
-  # prediction <- predict(model, newdata = data_test)
-  # performance <- performance(prediction, measure = "auc")
+  auc_measure <- function(data_test, data_train) {
+    task <- makeClassifTask(data = data_train, target = target)
+    learner <- makeLearner("classif.gbm", predict.type = "prob")
+    model <- train(learner, task)
+    
+    prediction <- predict(model, newdata = data_test)
+    performance <- performance(prediction, measure = auc)
+    return(performance)
+  }
+  
+  # auc_rm_cols <- auc_measure(data_test_rm_cols, data_train_rm_cols)
+  auc_rm_rows <- auc_measure(data_test_rm_rows, data_train_rm_rows)
+  auc_insert_mean <- auc_measure(data_test_insert_mean, data_train_insert_mean)
+  auc_mice <- auc_measure(data_test_mice, data_train_mice)
+  auc_vim_knn <- auc_measure(data_test_vim_knn, data_train_vim_knn)
+  auc_vim_irmi <- auc_measure(data_test_vim_irmi, data_train_vim_irmi)
+  auc_vim_hotdeck <- auc_measure(data_test_vim_hotdeck, data_train_vim_hotdeck)
+  auc_missForest <- auc_measure(data_test_missForest, data_train_missForest)
+  
+  auc_combined <- c(auc_rm_rows, auc_insert_mean, auc_mice, auc_vim_knn, auc_vim_irmi, auc_vim_hotdeck, auc_missForest)
+  return(auc_combined)
 }
