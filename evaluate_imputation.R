@@ -7,8 +7,8 @@ library(missForest)
 library(OpenML)
 
 # data <- boys
-data <- getOMLDataSet(55L)
-data <- data$data
+# data <- getOMLDataSet(55L)
+# data <- data$data
 
 # data[, 9] <- as.factor(ifelse(data[, 9] == "west", 0, 1))
 # target <- "reg"
