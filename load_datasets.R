@@ -131,10 +131,10 @@ target944<-target_column
 target944 %in% colnames(dataset944) # sprawdzenie czy się ok wczytało
 
 ################################
-IMPUTACJE
+# IMPUTACJE
 setwd("../../../Projekt_WB")
 getwd()
 source("evaluate_imputation.R")
 
-# Wywołania jak już funkcja będzie dopracowana
-# evaluate_imputation(dataset4, target4)
+# Wywołania funkcji - na razie wywaliło błąd
+# evaluation<-evaluate_imputation(dataset4, target4)
