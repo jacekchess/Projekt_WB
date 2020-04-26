@@ -3,19 +3,12 @@ library(tidyverse)
 library(DescTools)
 library(mlr)
 library(VIM)
-library(missForest)
+library(softImpute)
 library(OpenML)
+library(imputeMissings)
 
-# data <- boys
-# data <- getOMLDataSet(55L)
-# data <- data$data
-# data <- getOMLDataSet(55L)
-# data <- data$data
-# data[,20] <- as.factor(ifelse(data[,20] == "DIE", 1, 0))
-# target <- "Class"
-
-# data[, 9] <- as.factor(ifelse(data[, 9] == "west", 0, 1))
-# target <- "reg"
+data <- dataset1018
+target <- target1018
 
 evaluate_imputation <- function(data, target) {
   ### Funkcja przyjmuje jako argument ramkę danych, wykonuje na niej 5 różnych imputacji,
@@ -56,10 +49,10 @@ evaluate_imputation <- function(data, target) {
   # Imputacja funkcją mice
   data_train_mice <- data_train
   data_test_mice <- data_test
-  imp1 <- mice(data_train_mice, m = 5, maxit = 5)
-  data_train_mice <- complete(imp1)
-  imp2 <- mice(data_test_mice, m = 5, maxit = 5)
-  data_test_mice <- complete(imp2)
+  imp1 <- mice(data_train_mice, method = "pmm", m = 1, maxit = 1, nnet.MaxNWts=3000)
+  data_train_mice <- mice::complete(imp1)
+  imp2 <- mice(data_test_mice, method = "pmm", m = 1, maxit = 1, nnet.MaxNWts=3000)
+  data_test_mice <- mice::complete(imp2)
   
   # imputacja z VIM
   
@@ -68,26 +61,20 @@ evaluate_imputation <- function(data, target) {
   data_test_vim_knn <- kNN(data_test, imp_var = FALSE) 
   # dodaje kolumny z koncówka _imp, TRUE jesli imputowane, inaczej FALSE -> imp_var FALSE to usuwa
   
-  # irmi - jakies smieszne regresje
-  data_train_vim_irmi <- irmi(data_train, imp_var = FALSE) # dodaje te kolumny które uzupełnia, jak wyżej T/F
-  data_test_vim_irmi <- irmi(data_test, imp_var = FALSE)
-  
   # hotdeck - losowo wybrana wartość
   data_train_vim_hotdeck <- hotdeck(data_train, imp_var = FALSE) # podwaja, jak w knn
   data_test_vim_hotdeck <- hotdeck(data_test, imp_var = FALSE) 
   
-  # imputacja missForest
-  missForest_train_imp <- missForest(data_train) # zwraca liste
-  data_train_missForest <- missForest_train_imp$ximp
-  missForest_test_imp <- missForest(data_test) # zwraca liste
-  data_test_missForest <- missForest_test_imp$ximp
+  # softImpute + moda dla factorów
   
-  ## imputacja Amelia ? 
+  factors <- unlist(lapply(data, is.factor))
+  data_train_num <- softImpute::complete(data_train[!factors], softImpute(data_train[!factors], trace=TRUE, type='svd'))
+  data_train_fac <- imputeMissings::impute(data_train[factors], method='median/mode')
+  data_train_softImpute <- cbind(data_train_num,data_train_fac)
   
-  summary(data_train_vim_knn)
-  summary(data_train_vim_irmi)
-  summary(data_train_vim_hotdeck)
-  summary(data_train_missForest)
+  data_test_num <- softImpute::complete(data_test[!factors], softImpute(data_test[!factors], trace=TRUE, type='svd'))
+  data_test_fac <- imputeMissings::impute(data_test[factors], method='median/mode')
+  data_test_softImpute <- cbind(data_test_num,data_test_fac)
   
   ## Model gbm
   
@@ -101,15 +88,18 @@ evaluate_imputation <- function(data, target) {
     return(performance)
   }
   
-  # auc_rm_cols <- auc_measure(data_test_rm_cols, data_train_rm_cols)
   auc_rm_rows <- auc_measure(data_test_rm_rows, data_train_rm_rows)
   auc_insert_mean <- auc_measure(data_test_insert_mean, data_train_insert_mean)
   auc_mice <- auc_measure(data_test_mice, data_train_mice)
   auc_vim_knn <- auc_measure(data_test_vim_knn, data_train_vim_knn)
-  auc_vim_irmi <- auc_measure(data_test_vim_irmi, data_train_vim_irmi)
   auc_vim_hotdeck <- auc_measure(data_test_vim_hotdeck, data_train_vim_hotdeck)
-  auc_missForest <- auc_measure(data_test_missForest, data_train_missForest)
-  
-  auc_combined <- c(auc_rm_rows, auc_insert_mean, auc_mice, auc_vim_knn, auc_vim_irmi, auc_vim_hotdeck, auc_missForest)
+  auc_softImpute <- auc_measure(data_test_softImpute, data_train_softImpute)
+
+  auc_combined <- c(auc_rm_rows, 
+                    auc_insert_mean, 
+                    auc_mice, 
+                    auc_vim_knn, 
+                    auc_vim_hotdeck,
+                    auc_softImpute)
   return(auc_combined)
 }
