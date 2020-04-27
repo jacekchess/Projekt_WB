@@ -9,8 +9,8 @@ library(softImpute)
 library(OpenML)
 library(imputeMissings)
 
-data <- dataset4
-target <- target4
+# data <- dataset4
+# target <- target4
 
 evaluate_imputations <- function(data, target) {
   ### Funkcja przyjmuje jako argument ramkę danych, wykonuje na niej 5 różnych imputacji,

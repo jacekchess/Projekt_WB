@@ -122,22 +122,22 @@ evaluation_4 <- evaluate_imputations(dataset4,target4)
 
 ```
 
-```{r big data 2}
+```{r big data 2, cache=TRUE}
 evaluation_40536 <- evaluate_imputations(dataset40536,target40536) 
 ```
 
-```{r big data 3}
+```{r big data 3, cache=TRUE}
 # evaluation_23381 <- evaluate_imputations(dataset23381,target23381) # nie działa :( 
 ```
 
-```{r big data 4}
+```{r big data 4, cache=TRUE}
 ### do sprawdzenia, długo sie robi ale moze pojdzie 
 # evaluation_6332 <- evaluate_imputations(dataset6332,target6332) 
 # jak pojdzie to odkomentowac w miarach !!!
 # błąd - missing data in columns
 ```
 
-```{r big data 5}
+```{r big data 5, cache=TRUE}
 evaluation_1590 <- evaluate_imputations(dataset1590,target1590) 
 ```
 
