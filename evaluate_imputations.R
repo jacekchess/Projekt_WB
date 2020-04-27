@@ -2,21 +2,24 @@ library(mice)
 library(tidyverse)
 library(DescTools)
 library(mlr)
+library(mlr3)
+library(mlr3learners)
 library(VIM)
 library(softImpute)
 library(OpenML)
 library(imputeMissings)
 
-data <- dataset1018
-target <- target1018
+data <- dataset4
+target <- target4
 
-evaluate_imputation <- function(data, target) {
+evaluate_imputations <- function(data, target) {
   ### Funkcja przyjmuje jako argument ramkę danych, wykonuje na niej 5 różnych imputacji,
   ### a następnie porównuje wyniki imputacji przy pomocy modelu
+  ## returns a 5x2 matrix where rows are imputations and columns are AUC and Balanced ACC measures
   
   # podział na treningowy i testowy 
   
-  set.seed(123)
+  set.seed(13)
 
   n <- nrow(data)
   
@@ -32,8 +35,8 @@ evaluate_imputation <- function(data, target) {
   # data_test_rm_cols <- data_test  %>% select_if(~ !any(is.na(.)))
 
   # Ramka bez wierszy zawierajacych NA
-  data_train_rm_rows <- na.omit(data_train)
-  data_test_rm_rows <- na.omit(data_test)
+  # data_train_rm_rows <- na.omit(data_train)
+  # data_test_rm_rows <- na.omit(data_test)
   #data_rm_rows <- data[complete.cases(data), ]
   
   # Ramka uzupelniona średnią (w kolumnach numerycznych) lub modą (w innych)
@@ -78,28 +81,46 @@ evaluate_imputation <- function(data, target) {
   
   ## Model gbm
   
-  auc_measure <- function(data_test, data_train) {
-    task <- makeClassifTask(data = data_train, target = target)
-    learner <- makeLearner("classif.gbm", predict.type = "prob")
-    model <- train(learner, task)
+  rpart_model <- function(data_test, data_train) {
+    # takes test and train dataset and performs rpart modelling
+    # returns auc and  balanced acc measures
     
-    prediction <- predict(model, newdata = data_test)
-    performance <- performance(prediction, measure = c(acc,auc))
+    # MLR
+    # task <- makeClassifTask(data = data_train, target = target)
+    # learner <- makeLearner("classif.rpart", predict.type = "prob")
+    # model <- train(learner, task)
+    # 
+    # prediction <- predict(model, newdata = data_test)
+    # performance <- performance(prediction, measure = list(auc,acc))
+    
+    # MLR3
+    task <- TaskClassif$new(id = "svm", backend = data_train, target = target)
+    
+    # choosing learner
+    learner <- mlr_learners$get("classif.rpart")
+    learner$predict_type = "prob"
+    learner$train(task)
+    
+    # prediction
+    prediction <- learner$predict_newdata(data_test)
+    performance<-prediction$score(c(msr("classif.auc"), msr("classif.bacc")))
+    
     return(performance)
   }
   
-  auc_rm_rows <- auc_measure(data_test_rm_rows, data_train_rm_rows)
-  auc_insert_mean <- auc_measure(data_test_insert_mean, data_train_insert_mean)
-  auc_mice <- auc_measure(data_test_mice, data_train_mice)
-  auc_vim_knn <- auc_measure(data_test_vim_knn, data_train_vim_knn)
-  auc_vim_hotdeck <- auc_measure(data_test_vim_hotdeck, data_train_vim_hotdeck)
-  auc_softImpute <- auc_measure(data_test_softImpute, data_train_softImpute)
+  # perf_rm_rows <- rpart_model(data_test_rm_rows, data_train_rm_rows)
+  perf_insert_mean <- rpart_model(data_test_insert_mean, data_train_insert_mean)
+  perf_mice <- rpart_model(data_test_mice, data_train_mice)
+  perf_vim_knn <- rpart_model(data_test_vim_knn, data_train_vim_knn)
+  perf_vim_hotdeck <- rpart_model(data_test_vim_hotdeck, data_train_vim_hotdeck)
+  perf_softImpute <- rpart_model(data_test_softImpute, data_train_softImpute)
 
-  auc_combined <- c(auc_rm_rows, 
-                    auc_insert_mean, 
-                    auc_mice, 
-                    auc_vim_knn, 
-                    auc_vim_hotdeck,
-                    auc_softImpute)
-  return(auc_combined)
+  perf_combined <- as.data.frame(rbind( # perf_rm_rows,
+                    perf_insert_mean, 
+                    perf_mice, 
+                    perf_vim_knn, 
+                    perf_vim_hotdeck,
+                    perf_softImpute))
+  colnames(perf_combined)<-c("auc", "bacc")
+  return(perf_combined)
 }
