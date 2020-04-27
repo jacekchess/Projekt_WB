@@ -54,7 +54,11 @@ The imputations, that were performed on those datasets include:
 
 ### mean/mode imputation 
 
-### mice
+Replaces missing values with mean in numeric columns, or mode in character columns.
+
+### mice (Multivariate Imputation by Chained Equations)
+
+Creates multiple imputations (replacement values) for multivariate missing data.
 
 ### k-nearest neighbours (VIM package)
 
@@ -63,7 +67,11 @@ of aggregation depends on the type of the variable.
 
 ### hotdeck (VIM package)
 
+Method for handling missing data in which each missing value is replaced with an observed response from a “similar” unit.
+
 ### softImpute with median/mode imputation
+
+Fits a low-rank matrix approximation to a matrix with missing values via nuclear-norm regularization.
 
 ## Modelling 
 
