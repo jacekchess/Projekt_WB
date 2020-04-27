@@ -8,17 +8,23 @@ output: html_document
 ```{r setup, include=FALSE, warning=FALSE}
 knitr::opts_chunk$set(echo = FALSE, inlude=FALSE, results = 'hide')
 library(tidyverse)
+library(reshape2)
 source('evaluate_imputations.R')
 source('load_datasets.R')
 ```
 
 ## Abstract
 
-Imputation of missing observations is a common step of machine learning process and sometimes a difficult problem. Many real-life datasets are incomplete and ... to be continued XD
+Imputation of missing values is a common step of machine learning process and sometimes a difficult problem. Many real-life datasets contain incomplete observations and dealing with them is key part of modelling as most of the algorithms provided by widely used R packages (for instance caret or mlr) require complete data. There are many methods which allow to handle this issue. Firstly, there are basic ones such as removing rows or imputing with mean or mode, which are fast and easy to implement, however they do not guarantee a very good performance. On the other hand, many sophisticated strategies exist, e.g. using tree-based models, which usually result in better models, but enhance algorithm's complexity and computional time.
+In this paper the quality of different approaches to data imputation is compared, and their impact on binary classification data modelling is assessed.
+Summary of the results presents which imputations contributed to achiving the best model's predictions. 
 
 ## Introduction 
 
-The aim of this report is to measure the influence of five different imputation methods on the performance of a Recursive Partitioning And Regression Trees  classification model. To achieve this goal the following experiment will be conducted on 10 datasets, gathered mostly from OpenML and some from the imputation packages. 
+The aim of this report is to measure the influence of five different imputation methods on the performance of a selected classification model. Simple, common methods such as basic mean, median and mode are compared with advanced imputation techniques from specialized R packages - mice, VIM and softImpute.
+As a tested algorithm, Recursive Partitioning And Regression Trees was chosen.
+It's prediction effectiveness is assessed by AUC (area under the ROC curve) and BACC (Balanced Accuracy) to provide a proper measure for both balanced and imbalanced data.\
+To achieve the goal of this study the following experiment will be conducted on 10 datasets, gathered mostly from OpenML and some from the imputation packages.
 
 ## Methodology 
 
@@ -142,7 +148,7 @@ evaluation_40536 <- evaluate_imputations(dataset40536,target40536)
 evaluation_1590 <- evaluate_imputations(dataset1590,target1590) 
 ```
 
-```{r, results= 'markup'}
+```{r, results= 'markup', warning=FALSE, message=FALSE}
 # 1590, 188, 23381, 27, 29, 38, 4, 40536, 55, 56, 6332, 944
 auc_combined<-as.data.frame(
   rbind(
@@ -178,11 +184,27 @@ bacc_combined<-as.data.frame(
 ))
 
 colnames(bacc_combined)<-c('insert_mean','mice_pmm','vim_knn','vim_hotdeck','softImpute')
+```
+
+Following table presents AUC results of the imputations.
+
+```{r ,results='markup'}
+
+auc_combined <- as.data.frame(cbind(data_name, auc_combined))
 knitr::kable(auc_combined)
+
+bacc_combined <- as.data.frame(cbind(data_name, bacc_combined))
 knitr::kable(bacc_combined)
 
-boxplot(auc_combined, main = "AUC performance")
-boxplot(bacc_combined, main = "BACC performance")
+boxplot(auc_combined[, -1], main = "AUC performance")
+boxplot(bacc_combined[, -1], main = "BACC performance")
+
+auc_point_data <- melt(auc_combined)
+
+ggplot(auc_point_data, aes(x = data_name, y = value, color = variable)) +
+  geom_jitter() +
+  theme(axis.text.x = element_text(angle = 45))
+
 ```
 
 
