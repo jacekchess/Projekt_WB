@@ -9,11 +9,10 @@ library(softImpute)
 library(OpenML)
 library(imputeMissings)
 
-# data<-dataset944
-# target<-target944
+data <- dataset4
+target <- target4
 
 evaluate_imputations <- function(data, target) {
-  
   ### Funkcja przyjmuje jako argument ramkę danych, wykonuje na niej 5 różnych imputacji,
   ### a następnie porównuje wyniki imputacji przy pomocy modelu
   ## returns a 5x2 matrix where rows are imputations and columns are AUC and Balanced ACC measures
@@ -53,22 +52,32 @@ evaluate_imputations <- function(data, target) {
   # Imputacja funkcją mice
   data_train_mice <- data_train
   data_test_mice <- data_test
+  # if (dim(dataset)[1]==8844 & dim(dataset)[2]==56){
+  #   print("1018")
+  #   imp1 <- mice(data_train_mice, m = 1, maxit = 1, nnet.MaxNWts=3000)
+  #   data_train_mice <- mice::complete(imp1)
+  #   imp2 <- mice(data_test_mice, m = 1, maxit = 1, nnet.MaxNWts=3000)
+  #   data_test_mice <- mice::complete(imp2)
+  #   print("mice")
+  # }
+  # else{
   imp1 <- mice(data_train_mice, method = "pmm", m = 1, maxit = 1, nnet.MaxNWts=3000)
   data_train_mice <- mice::complete(imp1)
   imp2 <- mice(data_test_mice, method = "pmm", m = 1, maxit = 1, nnet.MaxNWts=3000)
   data_test_mice <- mice::complete(imp2)
-  
+  print("mice")
+  # }
   # imputacja z VIM
   
   # knn - najbliżsi sąsiedzi
   data_train_vim_knn <- kNN(data_train, imp_var = FALSE) 
   data_test_vim_knn <- kNN(data_test, imp_var = FALSE) 
   # dodaje kolumny z koncówka _imp, TRUE jesli imputowane, inaczej FALSE -> imp_var FALSE to usuwa
-  
+  print("knn")
   # hotdeck - losowo wybrana wartość
   data_train_vim_hotdeck <- hotdeck(data_train, imp_var = FALSE) # podwaja, jak w knn
   data_test_vim_hotdeck <- hotdeck(data_test, imp_var = FALSE) 
-  
+  print("hotdeck")
   # softImpute + moda dla factorów
   
   factors <- unlist(lapply(data, is.factor))
@@ -79,10 +88,10 @@ evaluate_imputations <- function(data, target) {
   data_test_num <- softImpute::complete(data_test[!factors], softImpute(data_test[!factors], trace=TRUE, type='svd'))
   data_test_fac <- imputeMissings::impute(data_test[factors], method='median/mode')
   data_test_softImpute <- cbind(data_test_num,data_test_fac)
-  
+  print("softImpute")
   ## Model gbm
   
-  model <- function(data_test, data_train) {
+  rpart_model <- function(data_test, data_train) {
     # takes test and train dataset and performs rpart modelling
     # returns auc and  balanced acc measures
     
@@ -95,10 +104,10 @@ evaluate_imputations <- function(data, target) {
     # performance <- performance(prediction, measure = list(auc,acc))
     
     # MLR3
-    task <- TaskClassif$new(id="task1", backend = data_train, target = target)
+    task <- TaskClassif$new(id = "svm", backend = data_train, target = target)
     
     # choosing learner
-    learner <- mlr_learners$get("classif.ranger")
+    learner <- mlr_learners$get("classif.rpart")
     learner$predict_type = "prob"
     learner$train(task)
     
@@ -109,12 +118,12 @@ evaluate_imputations <- function(data, target) {
     return(performance)
   }
   
-  # perf_rm_rows <- model(data_test_rm_rows, data_train_rm_rows)
-  perf_insert_mean <- model(data_test_insert_mean, data_train_insert_mean)
-  perf_mice <- model(data_test_mice, data_train_mice)
-  perf_vim_knn <- model(data_test_vim_knn, data_train_vim_knn)
-  perf_vim_hotdeck <- model(data_test_vim_hotdeck, data_train_vim_hotdeck)
-  perf_softImpute <- model(data_test_softImpute, data_train_softImpute)
+  # perf_rm_rows <- rpart_model(data_test_rm_rows, data_train_rm_rows)
+  perf_insert_mean <- rpart_model(data_test_insert_mean, data_train_insert_mean)
+  perf_mice <- rpart_model(data_test_mice, data_train_mice)
+  perf_vim_knn <- rpart_model(data_test_vim_knn, data_train_vim_knn)
+  perf_vim_hotdeck <- rpart_model(data_test_vim_hotdeck, data_train_vim_hotdeck)
+  perf_softImpute <- rpart_model(data_test_softImpute, data_train_softImpute)
 
   perf_combined <- as.data.frame(rbind( # perf_rm_rows,
                     perf_insert_mean, 
