@@ -6,7 +6,7 @@ output: html_document
 ---
 
 ```{r setup, include=FALSE}
-knitr::opts_chunk$set(echo = TRUE)
+knitr::opts_chunk$set(echo = FALSE)
 ```
 
 
@@ -14,15 +14,29 @@ knitr::opts_chunk$set(echo = TRUE)
 
 # Methodology 
 
+```{r}
+# coś o tym jak to robimy? funkcja z imputacjami i modelem, ładowanie zbiorów
+# nw czy to potrzebne
+```
+
+## Train and test set
+
+Each dataset is splitted into train set (80% of observation) and train set (20% of observation).
+
 ## Imputation
 
-Methods:
+### mean/mode imputation 
 
-* median/dominant
-* mice
-* vim - knn
-* vim - hotdeck
-* softImpute + median/dominant
+### mice
+
+### k-nearest neighbour (VIM package)
+
+An aggregation of the k values of the nearest neighbors is used as imputed value. The kind
+of aggregation depends on the type of the variable.
+
+### hotdeck (VIM package)
+
+### softImpute with median/mode imputation
 
 ## Modelling 
 
