@@ -9,8 +9,6 @@ library(softImpute)
 library(OpenML)
 library(imputeMissings)
 
-data <- dataset4
-target <- target4
 
 evaluate_imputations <- function(data, target) {
   ### Funkcja przyjmuje jako argument ramkę danych, wykonuje na niej 5 różnych imputacji,
@@ -81,7 +79,7 @@ evaluate_imputations <- function(data, target) {
   
   ## Model gbm
   
-  rpart_model <- function(data_test, data_train) {
+  model <- function(data_test, data_train) {
     # takes test and train dataset and performs rpart modelling
     # returns auc and  balanced acc measures
     
@@ -94,10 +92,10 @@ evaluate_imputations <- function(data, target) {
     # performance <- performance(prediction, measure = list(auc,acc))
     
     # MLR3
-    task <- TaskClassif$new(id = "svm", backend = data_train, target = target)
+    task <- TaskClassif$new(id="task1", backend = data_train, target = target)
     
     # choosing learner
-    learner <- mlr_learners$get("classif.rpart")
+    learner <- mlr_learners$get("classif.ranger")
     learner$predict_type = "prob"
     learner$train(task)
     
@@ -108,12 +106,12 @@ evaluate_imputations <- function(data, target) {
     return(performance)
   }
   
-  # perf_rm_rows <- rpart_model(data_test_rm_rows, data_train_rm_rows)
-  perf_insert_mean <- rpart_model(data_test_insert_mean, data_train_insert_mean)
-  perf_mice <- rpart_model(data_test_mice, data_train_mice)
-  perf_vim_knn <- rpart_model(data_test_vim_knn, data_train_vim_knn)
-  perf_vim_hotdeck <- rpart_model(data_test_vim_hotdeck, data_train_vim_hotdeck)
-  perf_softImpute <- rpart_model(data_test_softImpute, data_train_softImpute)
+  # perf_rm_rows <- model(data_test_rm_rows, data_train_rm_rows)
+  perf_insert_mean <- model(data_test_insert_mean, data_train_insert_mean)
+  perf_mice <- model(data_test_mice, data_train_mice)
+  perf_vim_knn <- model(data_test_vim_knn, data_train_vim_knn)
+  perf_vim_hotdeck <- model(data_test_vim_hotdeck, data_train_vim_hotdeck)
+  perf_softImpute <- model(data_test_softImpute, data_train_softImpute)
 
   perf_combined <- as.data.frame(rbind( # perf_rm_rows,
                     perf_insert_mean, 
