@@ -1,34 +1,37 @@
 ---
-title: "Praca domowa 2"
+title: "Comparision of efficiency of various data imputation techniques in R"
 author: "Agata Makarewicz, Martyna Majchrzak, Jacek Wiśniewski"
 date: "27 04 2020"
 output: html_document
 ---
 
 ```{r setup, include=FALSE, warning=FALSE}
-knitr::opts_chunk$set(echo = FALSE, inlude=FALSE)
+knitr::opts_chunk$set(echo = FALSE, inlude=FALSE, results = 'hide')
 library(tidyverse)
 source('evaluate_imputations.R')
 source('load_datasets.R')
 ```
 
+## Abstract
 
-# Introduction 
+Imputation of missing observations is a common step of machine learning process and sometimes a difficult problem. Many real-life datasets are incomplete and ... to be continued XD
 
-The aim of this report is to measure the influence of five different imputation methods on the performance of a Gradient Boosting Machine classification model. To achieve this goal the following experiment will be conducted on 12 datasets, gathered mostly from OpenML and some from the imputation packages. 
+## Introduction 
 
-# Methodology 
+The aim of this report is to measure the influence of five different imputation methods on the performance of a Recursive Partitioning And Regression Trees  classification model. To achieve this goal the following experiment will be conducted on 10 datasets, gathered mostly from OpenML and some from the imputation packages. 
+
+## Methodology 
 
 In the following table are presented the datasets used for this experiment, along with their OpenML ID number, name, number of instances and number of features. The datasets vary in size and number of missing values.
 
 
-```{r}
-data_nr<-c("1590", "188", "27", "29", "38", "4", "40536", "55", "56", "944")
-data_name<-c("adult", "eucalyptus", "colic", "credit-approval", "sick", "labor", "SpeedDating", "hepatitis", "vote", "echoMonths" )
-nr_instances<-c(48842, 736, 368, 690, 3772, 57, 8378, 155, 435, 130)
-nr_features<-c(13, 16, 20, 16, 28, 17, 123, 20, 17, 10)
+```{r, results='markup'}
+data_nr <- c("1590", "188", "27", "29", "38", "4", "40536", "55", "56", "944")
+data_name <- c("adult", "eucalyptus", "colic", "credit-approval", "sick", "labor", "SpeedDating", "hepatitis", "vote", "echoMonths" )
+nr_instances <- c(48842, 736, 368, 690, 3772, 57, 8378, 155, 435, 130)
+nr_features <- c(13, 16, 20, 16, 28, 17, 123, 20, 17, 10)
 
-datasets<-data.frame(cbind(data_nr, 
+datasets <- data.frame(cbind(data_nr, 
                      data_name, 
                      nr_instances, 
                      nr_features))
@@ -36,52 +39,49 @@ datasets<-data.frame(cbind(data_nr,
 knitr::kable(datasets)
 ```
 
-To conduct the experiment a function `evaluate_imputations()` placed in the script with the same name was implemented. The function receives a single dataset and the name of the target variable, and returns a matrix with 5 imputations as rows and 2 performance measures: AUC and Balanced Accuracy, as columns.
+### Imputation strategies
 
+The imputations, that were performed and analyzed include:
 
-## Train and test set
+* **mean/mode imputation**\
+  One of the basic techniques, replaces missing values with mean (for continuous variables) and mode (for categorical variables) of complete values in given variable. Implemented with basic R functions.
 
-Each dataset is splitted into train set (80% of observation) and train set (20% of observation).
+* **mice (predictive mean matching)**\
+   Performs multivariate imputation by chained equations, meaning it creates multiple imputations (replacement values) for multivariate missing data. Implemented with mice() function (with method parameter set to "pmm") from mice package.
 
-## Imputation
+* **k-nearest neighbours**\
+  An aggregation of the non-missing values of the k nearest neighbors is used as imputed value. The kind of aggregation depends on the type of the variable.Implemended with kNN() function from VIM package.
+  
+* **hotdeck** \
+  Each missing value is replaced with an observed response from a “similar” unit. Implemented with hotdeck() function from VIM package.
 
-The imputations, that were performed on those datasets include:
+* **softImpute combined with median/mode imputation**\
+  For numeric variables function softImpute() from softImpute package is used, fitting a low-rank matrix approximation to a matrix with missing values via nuclear-norm regularization. For remaining variables missing values are imputed with median or mode, which is implemented with impute() function from imputeMissings() package.
 
- - mean/mode imputation
- - predictive mean matching (mice package)
- - k-nearest neighbours (VIM package)
- - hotdeck (VIM package)
- - softImpute with median/mode imputation (softImpute package)
+### Implementation
 
-### mean/mode imputation 
+To conduct the experiment a function **evaluate_imputations()** placed in the script with the same name was implemented. The function receives as arguments:
 
-Replaces missing values with mean in numeric columns, or mode in character columns.
+* a single dataset to impute 
+* a name of the target variable
 
-### mice (Multivariate Imputation by Chained Equations)
+Dataset is splitted into train set (80% of observation) and train set (20% of observation).
+They are imputed separately, using methods described above, in order do avoid data leakage.
+Afterwards modelling is performed, using mlr3 package.Recursive Partitioning And Regression Trees learner is trained on train set and then prediction on test set are made. 
+Two evaluate the model performance two metrics are used:
 
-Creates multiple imputations (replacement values) for multivariate missing data.
+* **AUC**\
+  Area under the curve; represents degree or measure of separability. The probability that the model ranks a random positive example more highly than a random negative example.
+  
+* **Balanced Accuracy** \
+  Arythmetic mean of the TPR (Sensitivity) and FPR (Specificity). 
+  Balanced Accuracy is used instead of standard Accuracy (measures how good model is in corectly predicting both positive and negative cases), because some of the datasets are imbalanced, and due to that fact "normal" accuracy may not be proper (cost of misclassification of minority class instance is higher than for majority class instance).
 
-### k-nearest neighbours (VIM package)
+The function returns a matrix with 5 described imputations as rows and 2 performance measures as columns.
 
-An aggregation of the k values of the nearest neighbors is used as imputed value. The kind
-of aggregation depends on the type of the variable.
+## Results
 
-### hotdeck (VIM package)
-
-Method for handling missing data in which each missing value is replaced with an observed response from a “similar” unit.
-
-### softImpute with median/mode imputation
-
-Fits a low-rank matrix approximation to a matrix with missing values via nuclear-norm regularization.
-
-## Modelling 
-
-The modelling was performed using the mlr3 package, with Recursive Partitioning And Regression Trees learner.
-
-
-# Results
-
-```{r small data, cache=TRUE, warning=FALSE}
+```{r small data, cache=TRUE, warning=FALSE, results='hide'}
 # numery wszystkich zbiorów: 1018, 1590, 188, 23381, 27, 29, 38, 4, 40536, 41278, 55, 56, 6332, 944
 
 # numery używanych obecnie: 1590, 188, 23381, 27, 29, 38, 4, 40536, 55, 56, 6332, 944
@@ -142,7 +142,7 @@ evaluation_40536 <- evaluate_imputations(dataset40536,target40536)
 evaluation_1590 <- evaluate_imputations(dataset1590,target1590) 
 ```
 
-```{r}
+```{r, results= 'markup'}
 # 1590, 188, 23381, 27, 29, 38, 4, 40536, 55, 56, 6332, 944
 auc_combined<-as.data.frame(
   rbind(
