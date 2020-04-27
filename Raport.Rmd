@@ -73,7 +73,6 @@ The modelling was performed using the mlr3 package, with Recursive Partitioning 
 # Results
 
 ```{r small data, cache=TRUE, warning=FALSE}
-
 # numery wszystkich zbiorów: 1018, 1590, 188, 23381, 27, 29, 38, 4, 40536, 41278, 55, 56, 6332, 944
 
 # numery używanych obecnie: 1590, 188, 23381, 27, 29, 38, 4, 40536, 55, 56, 6332, 944

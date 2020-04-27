@@ -9,8 +9,11 @@ library(softImpute)
 library(OpenML)
 library(imputeMissings)
 
+# data<-dataset944
+# target<-target944
 
 evaluate_imputations <- function(data, target) {
+  
   ### Funkcja przyjmuje jako argument ramkę danych, wykonuje na niej 5 różnych imputacji,
   ### a następnie porównuje wyniki imputacji przy pomocy modelu
   ## returns a 5x2 matrix where rows are imputations and columns are AUC and Balanced ACC measures
