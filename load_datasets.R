@@ -73,6 +73,7 @@ source("code.R")
 dataset29<-dataset
 target29<-target_column
 target29 %in% colnames(dataset29) # sprawdzenie czy się ok wczytało
+colnames(dataset29)[8] <- "YearsEmployed"
 
 # 38
 setwd("../openml_dataset_38")
@@ -130,54 +131,8 @@ dataset944<-dataset
 target944<-target_column
 target944 %in% colnames(dataset944) # sprawdzenie czy się ok wczytało
 
-################################
-# IMPUTACJE
+#### zamknięcie
 setwd("../../../Projekt_WB")
 getwd()
-source("evaluate_imputation.R")
-
-##################################### TESTY ################################################
-
-# numery zbiorów: 1080, 1590, 188, 23381, 27, 29, 38, 4, 40536, 41278, 55, 56, 6332, 944
-
-###################### GIT ZBIORKI: 944, 56, 55, 38, 27, 188
-
-evaluation_944 <- evaluate_imputation(dataset944,target944)
-evaluation_56 <- evaluate_imputation(dataset56,target56) 
-evaluation_55 <- evaluate_imputation(dataset55,target55)
-evaluation_38 <- evaluate_imputation(dataset38,target38) # długi missForest 
-evaluation_27 <- evaluate_imputation(dataset27,target27)
-evaluation_188 <- evaluate_imputation(dataset188,target188)
-
-############################### PROBLEMY: 4, 29, 1018
-
-colnames(dataset29)[8] <- "YearsEmployed"
-evaluation_29 <- evaluate_imputation(dataset29,target29) 
-# działa przy ustawieniu pmm w mice, inaczej nie 
-
-# evaluation_4 <- evaluate_imputation(dataset4,target4) 
-# przy rm rows zeruje sie zbiór testowy, treningowy ma jeden wiersz 
-
-# evaluation_1018 <- evaluate_imputation(dataset1018,target1018)
-# przy rm rows zeruje sie zbiór testowy
-# przy mice nie działa dla "pmm"
-
-############################### DUŻE ZBIORKI: 41278, 6332, 40536, 1590, 1080
-
-# na potrzeby duzych zbiorów w mice jest 1x1 , pmm i dodatkowy parametr zeby te weights sie nie wywalało 
-# wykomentowane bo długo sie mielą i wywalaja sesje R czasami xd
-# testowałam funkcję ręcznie na data_test dla kazdego zbioru bo dla nich jeszcze w miare sie robiło
-# wiec mysle ze na train tez powinno działać xd
-
-# evaluation_6332 <- evaluate_imputation(dataset6332,target6332) 
-
-# ten zbiór jest zjebany bo mega duży, wywalił mi sesje 3 razy wiec moze go olejmy 
-# evaluation_41278 <- evaluate_imputation(dataset41278,target41278) 
-
-# evaluation_40536 <- evaluate_imputation(dataset40536,target40536) 
-
-# evaluation_23381 <- evaluate_imputation(dataset23381,target23381) 
-
-# evaluation_1590 <- evaluate_imputation(dataset1590,target1590) 
 
 
