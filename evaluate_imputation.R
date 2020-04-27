@@ -84,7 +84,7 @@ evaluate_imputation <- function(data, target) {
     model <- train(learner, task)
     
     prediction <- predict(model, newdata = data_test)
-    performance <- performance(prediction, measure = auc)
+    performance <- performance(prediction, measure = c(acc,auc))
     return(performance)
   }
   
