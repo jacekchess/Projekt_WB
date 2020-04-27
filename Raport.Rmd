@@ -1,0 +1,31 @@
+---
+title: "Praca domowa 2"
+author: "Agata Makarewicz, Martyna Majchrzak, Jacek Wiśniewski"
+date: "27 04 2020"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+
+# Introduction 
+
+# Methodology 
+
+## Imputation
+
+Methods:
+
+* median/dominant
+* mice
+* vim - knn
+* vim - hotdeck
+* softImpute + median/dominant
+
+## Modelling 
+
+# Results
+
+
