@@ -22,10 +22,10 @@ In the following table are presented the datasets used for this experiment, alon
 
 
 ```{r}
-data_nr<-c("1590", "188",  "23381", "27", "29", "38", "4", "40536", "55", "56", "6332", "944")
-data_name<-c("adult", "eucalyptus", "dresses-sales", "colic", "credit-approval", "sick", "labor", "SpeedDating", "hepatitis", "vote", "cylinder-bands", "echoMonths" )
-nr_instances<-c(48842, 736, 500, 368, 690, 3772, 57, 8378, 155, 435, 540, 130)
-nr_features<-c(13, 16, 13, 20, 16, 28, 17, 123, 20, 17, 34, 10)
+data_nr<-c("1590", "188", "27", "29", "38", "4", "40536", "55", "56", "6332", "944")
+data_name<-c("adult", "eucalyptus", "colic", "credit-approval", "sick", "labor", "SpeedDating", "hepatitis", "vote", "cylinder-bands", "echoMonths" )
+nr_instances<-c(48842, 736, 368, 690, 3772, 57, 8378, 155, 435, 540, 130)
+nr_features<-c(13, 16, 20, 16, 28, 17, 123, 20, 17, 34, 10)
 
 datasets<-data.frame(cbind(data_nr, 
                      data_name, 
@@ -97,23 +97,16 @@ evaluation_29 <- evaluate_imputations(dataset29,target29)
 # działa przy ustawieniu pmm w mice, inaczej nie
 evaluation_4 <- evaluate_imputations(dataset4,target4) 
 # przy rm rows zeruje sie zbiór testowy, treningowy ma jeden wiersz 
-evaluation_1590 <- evaluate_imputations(dataset1590,target1590) 
-evaluation_40536 <- evaluate_imputations(dataset40536,target40536) 
 
-### do sprawdzenia, długo sie robi ale moze pojdzie 
-# evaluation_6332 <- evaluate_imputations(dataset6332,target6332) 
-# jak pojdzie to odkomentowac w miarach !!!
-
-```
-
-```{r big data 1, cache=TRUE, warning=FALSE}
 ############################### PROBLEMY: 1018
-
-
 # evaluation_1018 <- evaluate_imputations(dataset1018,target1018)
 # przy rm rows zeruje sie zbiór testowy
 # przy mice nie działa dla "pmm"
 
+
+```
+
+```{r big data 1, cache=TRUE, warning=FALSE}
 
 ############################### DUŻE ZBIORKI: 41278, 6332, 40536, 1590, 23381
 
@@ -129,10 +122,24 @@ evaluation_40536 <- evaluate_imputations(dataset40536,target40536)
 
 ```
 
+```{r big data 2}
+evaluation_40536 <- evaluate_imputations(dataset40536,target40536) 
+```
+
 ```{r big data 3}
 # evaluation_23381 <- evaluate_imputations(dataset23381,target23381) # nie działa :( 
 ```
 
+```{r big data 4}
+### do sprawdzenia, długo sie robi ale moze pojdzie 
+# evaluation_6332 <- evaluate_imputations(dataset6332,target6332) 
+# jak pojdzie to odkomentowac w miarach !!!
+# błąd - missing data in columns
+```
+
+```{r big data 5}
+evaluation_1590 <- evaluate_imputations(dataset1590,target1590) 
+```
 
 ```{r}
 # 1590, 188, 23381, 27, 29, 38, 4, 40536, 55, 56, 6332, 944
