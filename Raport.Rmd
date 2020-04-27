@@ -22,10 +22,10 @@ In the following table are presented the datasets used for this experiment, alon
 
 
 ```{r}
-data_nr<-c("1590", "188", "27", "29", "38", "4", "40536", "55", "56", "6332", "944")
-data_name<-c("adult", "eucalyptus", "colic", "credit-approval", "sick", "labor", "SpeedDating", "hepatitis", "vote", "cylinder-bands", "echoMonths" )
-nr_instances<-c(48842, 736, 368, 690, 3772, 57, 8378, 155, 435, 540, 130)
-nr_features<-c(13, 16, 20, 16, 28, 17, 123, 20, 17, 34, 10)
+data_nr<-c("1590", "188", "27", "29", "38", "4", "40536", "55", "56", "944")
+data_name<-c("adult", "eucalyptus", "colic", "credit-approval", "sick", "labor", "SpeedDating", "hepatitis", "vote", "echoMonths" )
+nr_instances<-c(48842, 736, 368, 690, 3772, 57, 8378, 155, 435, 130)
+nr_features<-c(13, 16, 20, 16, 28, 17, 123, 20, 17, 10)
 
 datasets<-data.frame(cbind(data_nr, 
                      data_name, 
