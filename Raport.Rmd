@@ -5,7 +5,7 @@ date: "27 04 2020"
 output: html_document
 ---
 
-```{r setup, include=FALSE, warning=FALSE}
+```{r setup, include=FALSE, warning=FALSE, cache=TRUE}
 knitr::opts_chunk$set(echo = FALSE, inlude=FALSE)
 source('evaluate_imputations.R')
 source('load_datasets.R')
@@ -72,7 +72,7 @@ The modelling was performed using the mlr3 package, with Recursive Partitioning 
 
 # Results
 
-```{r evaluating_imputations, cache=TRUE, warning=FALSE}
+```{r small data, cache=TRUE, warning=FALSE}
 
 # numery wszystkich zbiorów: 1018, 1590, 188, 23381, 27, 29, 38, 4, 40536, 41278, 55, 56, 6332, 944
 
@@ -98,6 +98,9 @@ evaluation_4 <- evaluate_imputations(dataset4,target4)
 # przy rm rows zeruje sie zbiór testowy
 # przy mice nie działa dla "pmm"
 
+```
+
+```{r big data 1, cache=TRUE, warning=FALSE}
 ############################### DUŻE ZBIORKI: 41278, 6332, 40536, 1590, 23381
 
 # na potrzeby duzych zbiorów w mice jest 1x1 , pmm i dodatkowy parametr zeby te weights sie nie wywalało 
@@ -105,16 +108,23 @@ evaluation_4 <- evaluate_imputations(dataset4,target4)
 # testowałam funkcję ręcznie na data_test dla kazdego zbioru bo dla nich jeszcze w miare sie robiło
 # wiec mysle ze na train tez powinno działać xd
 
-evaluation_6332 <- evaluate_imputations(dataset6332,target6332) 
+# evaluation_6332 <- evaluate_imputations(dataset6332,target6332) 
 
 # ten zbiór jest zjebany bo mega duży, wywalił mi sesje 3 razy wiec moze go olejmy 
 # evaluation_41278 <- evaluate_imputationss(dataset41278,target41278) 
 
-evaluation_40536 <- evaluate_imputations(dataset40536,target40536) 
+```
 
-evaluation_23381 <- evaluate_imputations(dataset23381,target23381) 
+```{r big data 2}
+# evaluation_40536 <- evaluate_imputations(dataset40536,target40536) 
+```
 
-evaluation_1590 <- evaluate_imputations(dataset1590,target1590) 
+```{r big data 3}
+# evaluation_23381 <- evaluate_imputations(dataset23381,target23381) 
+```
+
+```{r big data 4}
+# evaluation_1590 <- evaluate_imputations(dataset1590,target1590) 
 
 ```
 
@@ -122,38 +132,38 @@ evaluation_1590 <- evaluate_imputations(dataset1590,target1590)
 # 1590, 188, 23381, 27, 29, 38, 4, 40536, 55, 56, 6332, 944
 auc_combined<-as.data.frame(
   rbind(
-  evaluation_1590$auc,
+  # evaluation_1590$auc,
   evaluation_188$auc,
-  evaluation_23381$auc,
+  # evaluation_23381$auc,
   evaluation_27$auc,
   evaluation_29$auc,
   evaluation_38$auc,
   evaluation_4$auc,
-  evaluation_40536$auc,
+  # evaluation_40536$auc,
   evaluation_55$auc,
   evaluation_56$auc,
-  evaluation_6332$auc,
-  evaluation_944$auc,
+  # evaluation_6332$auc,
+  evaluation_944$auc
 ))
-rownames(auc_combined)<-c('insert_mean','mice_pmm','vim_knn','vim_hotdeck','softImpute')
+colnames(auc_combined)<-c('insert_mean','mice_pmm','vim_knn','vim_hotdeck','softImpute')
 
 bacc_combined<-as.data.frame(
   rbind(
-  evaluation_1590$bacc,
+  # evaluation_1590$bacc,
   evaluation_188$bacc,
-  evaluation_23381$bacc,
+  # evaluation_23381$bacc,
   evaluation_27$bacc,
   evaluation_29$bacc,
   evaluation_38$bacc,
   evaluation_4$bacc,
-  evaluation_40536$bacc,
+  # evaluation_40536$bacc,
   evaluation_55$bacc,
   evaluation_56$bacc,
-  evaluation_6332$bacc,
-  evaluation_944$bacc,
+  # evaluation_6332$bacc,
+  evaluation_944$bacc
 ))
 
-rownames(bacc_combined)<-c('insert_mean','mice_pmm','vim_knn','vim_hotdeck','softImpute')
+colnames(bacc_combined)<-c('insert_mean','mice_pmm','vim_knn','vim_hotdeck','softImpute')
 
 ```
 
