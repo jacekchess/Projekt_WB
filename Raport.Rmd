@@ -7,6 +7,7 @@ output: html_document
 
 ```{r setup, include=FALSE, warning=FALSE}
 knitr::opts_chunk$set(echo = FALSE, inlude=FALSE)
+library(tidyverse)
 source('evaluate_imputations.R')
 source('load_datasets.R')
 ```
@@ -177,7 +178,11 @@ bacc_combined<-as.data.frame(
 ))
 
 colnames(bacc_combined)<-c('insert_mean','mice_pmm','vim_knn','vim_hotdeck','softImpute')
+knitr::kable(auc_combined)
+knitr::kable(bacc_combined)
 
+boxplot(auc_combined, main = "AUC performance")
+boxplot(bacc_combined, main = "BACC performance")
 ```
 
 
