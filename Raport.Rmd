@@ -150,7 +150,7 @@ evaluation_40536 <- evaluate_imputations(dataset40536,target40536)
 evaluation_1590 <- evaluate_imputations(dataset1590,target1590) 
 ```
 
-```{r, results= 'markup', warning=FALSE, message=FALSE}
+```{r, results= 'markup', warning=FALSE, message=FALSE, include=FALSE}
 # 1590, 188, 23381, 27, 29, 38, 4, 40536, 55, 56, 6332, 944
 auc_combined<-as.data.frame(
   rbind(
@@ -188,19 +188,31 @@ bacc_combined<-as.data.frame(
 colnames(bacc_combined)<-c('insert_mean','mice_pmm','vim_knn','vim_hotdeck','softImpute')
 ```
 
-Following table presents AUC results of the imputations.
+Following table presents AUC results of the imputations. As it turned out, while most results are approximately equal 0.85, the range is from 0.55 to 1.
 
-```{r ,results='markup'}
+```{r ,results='markup', warning=FALSE}
 
 auc_combined <- as.data.frame(cbind(data_name, auc_combined))
 knitr::kable(auc_combined)
+```
 
+The next table presents BACC results with more balanced effect.
+
+```{r ,results='markup', warning=FALSE}
 bacc_combined <- as.data.frame(cbind(data_name, bacc_combined))
 knitr::kable(bacc_combined)
+```
 
+To visualise difference between results of imputation methods, there are presented 2 boxlots. The visualisation shows not signifcant advantage of hotdeck imputation method and a little worse results of softImpute and knn methods.
+
+```{r ,results='markup', warning=FALSE}
 boxplot(auc_combined[, -1], main = "AUC performance")
 boxplot(bacc_combined[, -1], main = "BACC performance")
+```
 
+At the end of the research, there is a plot presenting all previous information in more transparent way. This data presantation enables to observe the difference in results between datasets.
+
+```{r ,results='markup', warning=FALSE, message=FALSE}
 auc_point_data <- melt(auc_combined)
 
 ggplot(auc_point_data, aes(x = data_name, y = value, color = variable)) +
