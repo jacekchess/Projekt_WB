@@ -5,10 +5,11 @@ date: "27 04 2020"
 output: html_document
 ---
 
-```{r setup, include=FALSE, warning=FALSE}
+```{r setup, include=FALSE, warning=FALSE, cache=TRUE}
 knitr::opts_chunk$set(echo = FALSE, inlude=FALSE, results = 'hide')
 library(tidyverse)
 library(reshape2)
+library(dplyr)
 source('evaluate_imputations.R')
 source('load_datasets.R')
 ```
@@ -28,7 +29,7 @@ To achieve the goal of this study the following experiment will be conducted on 
 
 ## Methodology 
 
-In the following table are presented the datasets used for this experiment, along with their OpenML ID number, name, number of instances and number of features. The datasets vary in size and number of missing values.
+In the following table are presented the datasets used for this experiment, along with their OpenML ID number, name, number of instances, number of features and number of missing values. The datasets vary in size and number of missing values.
 
 
 ```{r, results='markup'}
@@ -89,7 +90,7 @@ The function returns a matrix with 5 described imputations as rows and 2 perform
 
 ## Results
 
-```{r small data, cache=TRUE, warning=FALSE, results='hide'}
+```{r small data, cache=TRUE, warning=FALSE, message=FALSE, results='hide'}
 # numery wszystkich zbiorów: 1018, 1590, 188, 23381, 27, 29, 38, 4, 40536, 41278, 55, 56, 6332, 944
 
 # numery używanych obecnie: 1590, 188, 23381, 27, 29, 38, 4, 40536, 55, 56, 6332, 944
@@ -115,7 +116,7 @@ evaluation_4 <- evaluate_imputations(dataset4,target4)
 
 ```
 
-```{r big data 1, cache=TRUE, warning=FALSE}
+```{r big data 1, cache=TRUE, warning=FALSE, message=FALSE,}
 
 ############################### DUŻE ZBIORKI: 41278, 6332, 40536, 1590, 23381
 
@@ -131,22 +132,22 @@ evaluation_4 <- evaluate_imputations(dataset4,target4)
 
 ```
 
-```{r big data 2, cache=TRUE}
+```{r big data 2, cache=TRUE, warning=FALSE, message=FALSE,}
 evaluation_40536 <- evaluate_imputations(dataset40536,target40536) 
 ```
 
-```{r big data 3, cache=TRUE}
+```{r big data 3, cache=TRUE, warning=FALSE, message=FALSE,}
 # evaluation_23381 <- evaluate_imputations(dataset23381,target23381) # nie działa :( 
 ```
 
-```{r big data 4, cache=TRUE}
+```{r big data 4, cache=TRUE, warning=FALSE, message=FALSE,}
 ### do sprawdzenia, długo sie robi ale moze pojdzie 
 # evaluation_6332 <- evaluate_imputations(dataset6332,target6332) 
 # jak pojdzie to odkomentowac w miarach !!!
 # błąd - missing data in columns
 ```
 
-```{r big data 5, cache=TRUE}
+```{r big data 5, cache=TRUE, warning=FALSE, message=FALSE,}
 evaluation_1590 <- evaluate_imputations(dataset1590,target1590) 
 ```
 
@@ -190,7 +191,7 @@ colnames(bacc_combined)<-c('insert_mean','mice_pmm','vim_knn','vim_hotdeck','sof
 
 Following table presents AUC results of the imputations. As it turned out, while most results are approximately equal 0.85, the range is from 0.55 to 1.
 
-```{r ,results='markup', warning=FALSE}
+```{r ,results='markup', warning=FALSE, message=FALSE,}
 
 auc_combined <- as.data.frame(cbind(data_name, auc_combined))
 knitr::kable(auc_combined)
@@ -226,17 +227,21 @@ ggplot(auc_point_data, aes(x = data_name, y = value, color = variable)) +
 
 There are no considerable differences between chosen methods of implementation as far as the performance of the rpart model is concerned.
 Boxplots show a slight advantage to inserting mean and mode and the hotdeck imputation from VIM, 
-but its mostly because they perform considerably better than the other on the 'labour' dataset.
+but its mostly because they perform considerably better than the others on the `labor` dataset.
+
+```{r, results='markup'}
+knitr::kable(bacc_combined[6,])
+```
 
 The closer examination of this dataset shows the following:
-```{r}
+```{r, results='markup'}
 visdat::vis_dat(dataset4)
 ```
 
 Most rows in this dataset have a missing value in at least one column.
 
-```{r}
-naniar::miss_var_summary(dataset4)
+```{r, results='markup'}
+knitr::kable(naniar::miss_var_summary(dataset4))
 
 ```
 
@@ -246,8 +251,28 @@ In that situation, choosing a simpler method, such as mean insertion or choosing
 
 ## Number of missing values in datasets
 
-```{r missing-nr}
-library(dplyr)
-datasets1<-datasets%>%mutate(procent_missing=nr_missing/(nr_instances+nr_features))
+Consider the following table of percent of values missing in a dataset, calculated as number of all cells with missing value, divided by number of all cells.
+
+```{r missing-nr, results='markup'}
+datasets1<-datasets%>%
+  transmute(data_nr=data_nr,
+            data_name=data_name,
+            nr_instances=as.numeric(as.character(nr_instances)),
+            nr_features=as.numeric(as.character(nr_features)),
+            nr_missing=as.numeric(as.character(nr_missing)))%>%
+  mutate(procent_missing=round(nr_missing/(nr_instances*nr_features),2))%>%
+  select(data_nr, data_name, procent_missing)%>%
+  arrange(desc(procent_missing))
+
+knitr::kable(datasets1)
 ```
 
+As you can see, the dataset `labor` has by far the highest percent of the missing values, over double the percent of the next one in this ranking. If we take a closer look at the second one, `colic`, the balanced accuracy measure is also slightly higher in the mean insertion and hotdeck method, but this time softImpute did just as well as them.
+
+```{r, results='markup'}
+knitr::kable(bacc_combined[3,])
+```
+
+# Further examination
+
+In conclusion, the percent of the missing values in the dataset may have an effect on the infuence that choosing an imputation method has on the performance of the model. This could be the subject for further examination in this subject.

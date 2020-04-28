@@ -22,3 +22,4 @@ softImpute
 OpenML
 imputeMissings
 jsonlite
+reshape2
