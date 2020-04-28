@@ -36,11 +36,13 @@ data_nr <- c("1590", "188", "27", "29", "38", "4", "40536", "55", "56", "944")
 data_name <- c("adult", "eucalyptus", "colic", "credit-approval", "sick", "labor", "SpeedDating", "hepatitis", "vote", "echoMonths" )
 nr_instances <- c(48842, 736, 368, 690, 3772, 57, 8378, 155, 435, 130)
 nr_features <- c(13, 16, 20, 16, 28, 17, 123, 20, 17, 10)
+nr_missing<-c(6465, 455, 1199, 67, 2293, 326, 18570, 167, 392, 97)
 
 datasets <- data.frame(cbind(data_nr, 
                      data_name, 
                      nr_instances, 
-                     nr_features))
+                     nr_features,
+                     nr_missing))
 # colnames(datasets)
 knitr::kable(datasets)
 ```
@@ -207,4 +209,33 @@ ggplot(auc_point_data, aes(x = data_name, y = value, color = variable)) +
 
 ```
 
+# Conclusion
+
+
+There are no considerable differences between chosen methods of implementation as far as the performance of the rpart model is concerned.
+Boxplots show a slight advantage to inserting mean and mode and the hotdeck imputation from VIM, 
+but its mostly because they perform considerably better than the other on the 'labour' dataset.
+
+The closer examination of this dataset shows the following:
+```{r}
+visdat::vis_dat(dataset4)
+```
+
+Most rows in this dataset have a missing value in at least one column.
+
+```{r}
+naniar::miss_var_summary(dataset4)
+
+```
+
+Columns with two highest procentages of missing values - standby.pay and wage.increase.third.year are both numeric features. Trying to predict the value of the feature based on only 15-25% od the data is a really demanding task,
+which may cause the more sophisticated imputation algorithms, such as Predictive Mean Matching or SoftImpute to be ineffective.
+In that situation, choosing a simpler method, such as mean insertion or choosing a random value for the column, in this exaple, showed to effect in better results.
+
+## Number of missing values in datasets
+
+```{r missing-nr}
+library(dplyr)
+datasets1<-datasets%>%mutate(procent_missing=nr_missing/(nr_instances+nr_features))
+```
 
