@@ -235,7 +235,7 @@ library(ggplot2)
 auc_point_data <- melt(auc_combined)
 
 ggplot(auc_point_data, aes(x = data_name, y = value, color = variable)) +
-  geom_jitter(width=0.25) +
+  geom_jitter(width=0.15) +
   theme(axis.text.x = element_text(angle = 45))+
   scale_x_discrete(expand=c(0.1, 0.2))
 
@@ -249,7 +249,7 @@ Boxplots show a slight advantage to inserting mean and mode and the hotdeck impu
 but its mostly because they perform considerably better than the others on the `labor` dataset.
 
 ```{r, results='markup'}
-knitr::kable(auc_combined[6,], caption = "Extract from Tab.2")
+knitr::kable(bacc_combined[6,], caption = "Extract from Tab.3")
 ```
 
 The closer examination of this dataset shows the following:
@@ -274,9 +274,19 @@ Consider the column procent_missing in Tab.1, calculated as number of all cells 
 As you can see, the dataset `labor` has by far the highest percent of the missing values, over double the percent of the next one in this ranking. If we take a closer look at the second one in the ranking, `colic`, the balanced accuracy measure is also slightly higher in the mean insertion and hotdeck method, but this time softImpute did just as well as them.
 
 ```{r, results='markup'}
-knitr::kable(auc_combined[3,], caption = "Extract from Tab.2")
+knitr::kable(bacc_combined[3,], caption = "Extract from Tab.3")
 ```
 
 # Further examination
 
 In conclusion, the percent of the missing values in the dataset may have an effect on the infuence that choosing an imputation method has on the performance of the model. This could be the subject for further examination in this subject.
+
+# References 
+
+1. mice package https://cran.r-project.org/web/packages/mice/index.html
+
+2. VIM package https://cran.r-project.org/web/packages/VIM/index.html
+
+3. softImpute package https://cran.r-project.org/web/packages/softImpute/index.html
+
+4. mlr3 package https://mlr3.mlr-org.com/
