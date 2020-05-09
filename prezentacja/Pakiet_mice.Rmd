@@ -14,7 +14,7 @@ library(mice)
 library(knitr)
 ```
 
-## Wprowadzenie
+## Wprowadzenie {.centered}
 
 MICE - Multivariate Imputation by Chained Equations
 (wielowymiarowa imputacja za pomocą równań łańcuchowych)
