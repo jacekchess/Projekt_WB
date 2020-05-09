@@ -68,3 +68,5 @@ new_function <- function(data, target, data_name) {
   setwd("~/Projekt_WB")
   return(perf_combined)
 }
+
+new_function(dataset55,target55,"dataset55")
