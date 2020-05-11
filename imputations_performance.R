@@ -53,6 +53,17 @@ imputations_performance <- function(target, data_name, model_name) {
   test_softImpute <- read.csv2(paste0(directory,"/test_softImpute.csv"))
   train_softImpute <- read.csv2(paste0(directory,"/train_softImpute.csv"))
   
+  # rzutowanie zmiennej target na factor - dla bezpieczeństwa
+  test_mean[,target]<-as.factor(test_mean[, target])
+  train_mean[,target]<-as.factor(train_mean[, target])
+  test_mice[,target]<-as.factor(test_mice[, target])
+  train_mice[,target]<-as.factor(train_mice[, target])
+  test_vim_knn[,target]<-as.factor(test_vim_knn[, target])
+  train_vim_knn[,target]<-as.factor(train_vim_knn[, target])
+  test_vim_hotdeck[,target]<-as.factor(test_vim_hotdeck[, target])
+  train_vim_hotdeck[,target]<-as.factor(train_vim_hotdeck[, target])
+  test_softImpute[,target]<-as.factor(test_softImpute[, target])
+  train_softImpute[,target]<-as.factor(train_softImpute[, target])
   
   perf_insert_mean <- model(test_mean, train_mean, model_name)
   perf_mice <- model(test_mice, train_mice, model_name)
@@ -70,7 +81,3 @@ imputations_performance <- function(target, data_name, model_name) {
   return(perf_combined)
 }
 
-evaluation_188_rpart <- imputations_performance(target188,  "dataset188", "classif.rpart")
-target<-target188
-data_name<-"dataset188"
-model_name<-"classif.rpart"

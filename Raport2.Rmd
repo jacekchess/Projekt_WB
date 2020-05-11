@@ -11,6 +11,7 @@ library(tidyverse)
 library(reshape2)
 library(dplyr)
 source('imputations_performance.R')
+source('load_datasets.R')
 ```
 
 ## Abstract
@@ -94,12 +95,9 @@ They are imputed separately, using methods described above, in order do avoid da
 Afterwards modelling is performed, using mlr3 package.Recursive Partitioning And Regression Trees learner is trained on train set and then prediction on test set are made. 
 Two evaluate the model performance two metrics are used:
 
-* **AUC**\
-  Area under the curve; represents degree or measure of separability. The probability that the model ranks a random positive example more highly than a random negative example.
-  
-* **Balanced Accuracy** \
-  Arythmetic mean of the TPR (Sensitivity) and FPR (Specificity). 
-  Balanced Accuracy is used instead of standard Accuracy (measures how good model is in corectly predicting both positive and negative cases), because some of the datasets are imbalanced, and due to that fact "normal" accuracy may not be proper (cost of misclassification of minority class instance is higher than for majority class instance).
+* **F1**\
+ 
+ .... <- UZUPEŁNIĆ
 
 The function returns a matrix with 5 described imputations as rows and 2 performance measures as columns.
 
@@ -117,7 +115,7 @@ evaluation_56_rpart <- imputations_performance(target56, "dataset56", "classif.r
 evaluation_55_rpart <- imputations_performance(target55,  "dataset55", "classif.rpart")
 evaluation_38_rpart <- imputations_performance(target38,  "dataset38", "classif.rpart") # długi missForest 
 evaluation_27_rpart <- imputations_performance(target27,  "dataset27", "classif.rpart")
-# evaluation_188_rpart <- imputations_performance(target188,  "dataset188", "classif.rpart") - jeden lvl zmiennej celu
+ evaluation_188_rpart <- imputations_performance(target188,  "dataset188", "classif.rpart") 
 evaluation_29_rpart <- imputations_performance(target29,  "dataset29", "classif.rpart") 
 # działa przy ustawieniu pmm w mice, inaczej nie
 evaluation_4_rpart <- imputations_performance(target4,  "dataset4", "classif.rpart") 
@@ -148,7 +146,7 @@ evaluation_4_rpart <- imputations_performance(target4,  "dataset4", "classif.rpa
 ```
 
 ```{r big data 2, results='hide'}
-# evaluation_40536_rpart <- imputations_performance(target40536,  "dataset40536", "classif.rpart") # jeden lvl zmiennej celu
+evaluation_40536_rpart <- imputations_performance(target40536,  "dataset40536", "classif.rpart")
 ```
 
 ```{r big data 3, results='hide'}
@@ -166,27 +164,31 @@ evaluation_4_rpart <- imputations_performance(target4,  "dataset4", "classif.rpa
 evaluation_1590_rpart <- imputations_performance(target1590, "dataset1590", "classif.rpart") 
 ```
 
-```{r, results= 'markup'}
+```{r f1 rpart, results= 'markup'}
 # 1590, 188, 23381, 27, 29, 38, 4, 40536, 55, 56, 6332, 944
 f1_combined_rpart<-as.data.frame(
   rbind(
   evaluation_1590_rpart$f1,
-  #evaluation_188_rpart$f1,
+  evaluation_188_rpart$f1,
   # evaluation_23381$auc,
   evaluation_27_rpart$f1,
   evaluation_29_rpart$f1,
   evaluation_38_rpart$f1,
   evaluation_4_rpart$f1,
-  #evaluation_40536_rpart$f1,
+  evaluation_40536_rpart$f1,
   evaluation_55_rpart$f1,
   evaluation_56_rpart$f1,
   # evaluation_6332$f1,
   evaluation_944_rpart$f1
 ))
 colnames(f1_combined_rpart)<-c('insert_mean','mice_pmm','vim_knn','vim_hotdeck','softImpute')
+f1_combined_rpart<-cbind(data_name, f1_combined_rpart)
 
 ```
 
+```{r tab2, resuls='hide'}
+knitr::kable(f1_combined_rpart, caption = "Tab.2. Rpart results")
+```
 
 # References 
 
