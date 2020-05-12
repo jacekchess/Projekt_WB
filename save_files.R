@@ -15,6 +15,10 @@ save_to_file <- function(data, target, data_name) {
 
   # podział na treningowy i testowy 
   
+  # if(dim(data)[1]==500 && dim(data)[2]==13) {
+  #   data <- data[,c(-10, -11)]
+  # }
+  
   set.seed(13)
   
   n <- nrow(data)
@@ -23,6 +27,7 @@ save_to_file <- function(data, target, data_name) {
   test_set = setdiff(seq_len(n), train_set)
   data_train <- data[train_set,]
   data_test <- data[test_set,]
+  
   
   ## Imputacja
   
@@ -92,15 +97,19 @@ save_to_file <- function(data, target, data_name) {
   write.csv2(data_test_softImpute,paste0("./files/",data_name,"/test_softImpute.csv"), row.names = FALSE)
 }
 
+# save_to_file(dataset1018,target1018,"dataset1018") dziwny error
 save_to_file(dataset1590,target1590,"dataset1590") # done
 save_to_file(dataset188,target188,"dataset188") # done
+save_to_file(dataset23381,target23381,"dataset23381") # done
 save_to_file(dataset27,target27,"dataset27") # done
 save_to_file(dataset29,target29,"dataset29") # done
 save_to_file(dataset38,target38,"dataset38") # done
 save_to_file(dataset4,target4,"dataset4") # done
-save_to_file(dataset40536,target40536,"dataset40536") # done 
+save_to_file(dataset40536,target40536,"dataset40536") # done
+save_to_file(dataset41278,target41278,"dataset41278") # done
 save_to_file(dataset55,target55,"dataset55") # done
 save_to_file(dataset56,target56,"dataset56") # done
+save_to_file(dataset6332,target6332,"dataset6332") # done
 save_to_file(dataset944,target944,"dataset944") # done
 
 

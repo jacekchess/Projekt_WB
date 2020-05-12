@@ -27,7 +27,9 @@ imputations_performance <- function(target, data_name, model_name) {
     # performance <- performance(prediction, measure = list(auc,acc))
     
     # MLR3
+    
     task <- TaskClassif$new(id="task", backend = data_train, target = target)
+    
     
     # choosing learner
     learner <- mlr_learners$get(model_name)
@@ -35,6 +37,7 @@ imputations_performance <- function(target, data_name, model_name) {
     learner$train(task)
     
     # prediction
+           
     prediction <- learner$predict_newdata(data_test)
     
     performance<-prediction$score(msr("classif.fbeta"))
@@ -70,6 +73,7 @@ imputations_performance <- function(target, data_name, model_name) {
   perf_vim_knn <- model(test_vim_knn,train_vim_knn, model_name)
   perf_vim_hotdeck <- model(test_vim_hotdeck, train_vim_hotdeck, model_name)
   perf_softImpute <- model(test_softImpute,train_softImpute, model_name)
+
    
   perf_combined <- as.data.frame(rbind( 
      perf_insert_mean, 
@@ -80,4 +84,3 @@ imputations_performance <- function(target, data_name, model_name) {
    colnames(perf_combined)<-"f1"
   return(perf_combined)
 }
-

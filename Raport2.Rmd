@@ -6,7 +6,7 @@ output: html_document
 ---
 
 ```{r setup, include=TRUE, warning=FALSE, echo=FALSE, resuls='hide', include=FALSE}
-knitr::opts_chunk$set(echo = FALSE, warning=FALSE, message=FALSE, cache=TRUE)
+knitr::opts_chunk$set(echo = FALSE, warning=FALSE, message=FALSE, cache=FALSE)
 library(tidyverse)
 library(reshape2)
 library(dplyr)
@@ -37,11 +37,11 @@ In the following table are presented the datasets used for this experiment, alon
 
 ```{r dataset table, results='hide'}
 library(dplyr)
-data_nr <- c("1590", "188", "27", "29", "38", "4", "40536", "55", "56", "944")
-data_name <- c("adult", "eucalyptus", "colic", "credit-approval", "sick", "labor", "SpeedDating", "hepatitis", "vote", "echoMonths" )
-nr_instances <- c(48842, 736, 368, 690, 3772, 57, 8378, 155, 435, 130)
-nr_features <- c(13, 16, 20, 16, 28, 17, 123, 20, 17, 10)
-nr_missing<-c(6465, 455, 1199, 67, 2293, 326, 18570, 167, 392, 97)
+data_nr <- c("1590", "188", "27", "29", "38", "4", "40536", "55", "56", "6332", "944")
+data_name <- c("adult", "eucalyptus", "colic", "credit-approval", "sick", "labor", "SpeedDating", "hepatitis", "vote", "cylinder-bands", "echoMonths" )
+nr_instances <- c(48842, 736, 368, 690, 3772, 57, 8378, 155, 435, 540, 130)
+nr_features <- c(13, 16, 20, 16, 28, 17, 123, 20, 17, 34, 10)
+nr_missing<-c(6465, 455, 1199, 67, 2293, 326, 18570, 167, 392, 999, 97)
 
 datasets <- data.frame(cbind(data_nr, 
                      data_name, 
@@ -115,11 +115,11 @@ evaluation_56_rpart <- imputations_performance(target56, "dataset56", "classif.r
 evaluation_55_rpart <- imputations_performance(target55,  "dataset55", "classif.rpart")
 evaluation_38_rpart <- imputations_performance(target38,  "dataset38", "classif.rpart") # długi missForest 
 evaluation_27_rpart <- imputations_performance(target27,  "dataset27", "classif.rpart")
- evaluation_188_rpart <- imputations_performance(target188,  "dataset188", "classif.rpart") 
-evaluation_29_rpart <- imputations_performance(target29,  "dataset29", "classif.rpart") 
+evaluation_188_rpart <- imputations_performance(target188, "dataset188", "classif.rpart") 
+evaluation_29_rpart <- imputations_performance(target29, "dataset29", "classif.rpart") 
 # działa przy ustawieniu pmm w mice, inaczej nie
 evaluation_4_rpart <- imputations_performance(target4,  "dataset4", "classif.rpart") 
-# przy rm rows zeruje sie zbiór testowy, treningowy ma jeden wiersz 
+# przy rm rows zeruje sie zbiór testowy, treningowy ma jeden wiersz
 
 ############################### PROBLEMY: 1018
 # evaluation_1018 <- imputations_performance(dataset1018,target1018)
@@ -141,7 +141,7 @@ evaluation_4_rpart <- imputations_performance(target4,  "dataset4", "classif.rpa
 
 
 # ten zbiór jest zjebany bo mega duży, wywalił mi sesje 3 razy wiec moze go olejmy 
-# evaluation_41278 <- imputations_performances(dataset41278,target41278) 
+# evaluation_41278 <- imputations_performance(target41278,"dataset41278", "classif.rpart") 
 
 ```
 
@@ -150,12 +150,12 @@ evaluation_40536_rpart <- imputations_performance(target40536,  "dataset40536", 
 ```
 
 ```{r big data 3, results='hide'}
-# evaluation_23381 <- imputations_performance(dataset23381,target23381) # nie działa :( 
+# evaluation_23381 <- imputations_performance(target23381, "dataset23381", "classif.rpart") # nie działa :( 
 ```
 
 ```{r big data 4, results='hide'}
 ### do sprawdzenia, długo sie robi ale moze pojdzie 
-# evaluation_6332 <- imputations_performance(dataset6332,target6332) 
+evaluation_6332 <- imputations_performance(target6332, "dataset6332", "classif.rpart") 
 # jak pojdzie to odkomentowac w miarach !!!
 # błąd - missing data in columns
 ```
@@ -170,15 +170,16 @@ f1_combined_rpart<-as.data.frame(
   rbind(
   evaluation_1590_rpart$f1,
   evaluation_188_rpart$f1,
-  # evaluation_23381$auc,
+  #evaluation_23381$auc,
   evaluation_27_rpart$f1,
   evaluation_29_rpart$f1,
   evaluation_38_rpart$f1,
   evaluation_4_rpart$f1,
   evaluation_40536_rpart$f1,
+  #evaluation_41278_rpart$f1,
   evaluation_55_rpart$f1,
   evaluation_56_rpart$f1,
-  # evaluation_6332$f1,
+  evaluation_6332$f1,
   evaluation_944_rpart$f1
 ))
 colnames(f1_combined_rpart)<-c('insert_mean','mice_pmm','vim_knn','vim_hotdeck','softImpute')
