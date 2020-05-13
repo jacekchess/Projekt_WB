@@ -6,7 +6,7 @@ output: html_document
 ---
 
 ```{r setup, include=TRUE, warning=FALSE, echo=FALSE, resuls='hide', include=FALSE}
-knitr::opts_chunk$set(echo = FALSE, warning=FALSE, message=FALSE, cache=FALSE)
+knitr::opts_chunk$set(echo = FALSE, warning=FALSE, message=FALSE, cache=TRUE)
 library(tidyverse)
 library(reshape2)
 library(dplyr)
@@ -155,7 +155,7 @@ evaluation_40536_rpart <- imputations_performance(target40536,  "dataset40536", 
 
 ```{r big data 4, results='hide'}
 ### do sprawdzenia, długo sie robi ale moze pojdzie 
-evaluation_6332 <- imputations_performance(target6332, "dataset6332", "classif.rpart") 
+evaluation_6332_rpart <- imputations_performance(target6332, "dataset6332", "classif.rpart") 
 # jak pojdzie to odkomentowac w miarach !!!
 # błąd - missing data in columns
 ```
@@ -179,7 +179,7 @@ f1_combined_rpart<-as.data.frame(
   #evaluation_41278_rpart$f1,
   evaluation_55_rpart$f1,
   evaluation_56_rpart$f1,
-  evaluation_6332$f1,
+  evaluation_6332_rpart$f1,
   evaluation_944_rpart$f1
 ))
 colnames(f1_combined_rpart)<-c('insert_mean','mice_pmm','vim_knn','vim_hotdeck','softImpute')
@@ -189,6 +189,154 @@ f1_combined_rpart<-cbind(data_name, f1_combined_rpart)
 
 ```{r tab2, resuls='hide'}
 knitr::kable(f1_combined_rpart, caption = "Tab.2. Rpart results")
+```
+
+## Results Naive Bayes
+
+```{r nb 1, results='hide'}
+# numery wszystkich zbiorów: 1018, 1590, 188, 23381, 27, 29, 38, 4, 40536, 41278, 55, 56, 6332, 944
+
+# numery używanych obecnie: 1590, 188, 23381, 27, 29, 38, 4, 40536, 55, 56, 6332, 944
+
+###################### GIT ZBIORKI: 944, 56, 55, 38, 27, 188, 29, 4
+
+evaluation_944_nb <- imputations_performance(target944, "dataset944", "classif.naive_bayes")
+evaluation_56_nb <- imputations_performance(target56, "dataset56", "classif.naive_bayes") 
+evaluation_55_nb <- imputations_performance(target55,  "dataset55", "classif.naive_bayes")
+evaluation_38_nb <- imputations_performance(target38,  "dataset38", "classif.naive_bayes") # długi missForest 
+evaluation_27_nb <- imputations_performance(target27,  "dataset27", "classif.naive_bayes")
+evaluation_188_nb <- imputations_performance(target188, "dataset188", "classif.naive_bayes") 
+evaluation_29_nb <- imputations_performance(target29, "dataset29", "classif.naive_bayes") 
+# działa przy ustawieniu pmm w mice, inaczej nie
+evaluation_4_nb <- imputations_performance(target4,  "dataset4", "classif.naive_bayes") 
+# przy rm rows zeruje sie zbiór testowy, treningowy ma jeden wiersz
+
+############################### PROBLEMY: 1018
+# evaluation_1018 <- imputations_performance(dataset1018,target1018)
+# przy rm rows zeruje sie zbiór testowy
+# przy mice nie działa dla "pmm"
+
+
+```
+
+```{r nb 2, results='hide'}
+evaluation_40536_nb <- imputations_performance(target40536,  "dataset40536", "classif.naive_bayes")
+```
+
+```{r nb 3, results='hide'}
+# evaluation_23381 <- imputations_performance(target23381, "dataset23381", "classif.naive_bayes") # nie działa :( 
+```
+
+```{r nb 4, results='hide'}
+### do sprawdzenia, długo sie robi ale moze pojdzie 
+evaluation_6332_nb <- imputations_performance(target6332, "dataset6332", "classif.naive_bayes") 
+# jak pojdzie to odkomentowac w miarach !!!
+# błąd - missing data in columns
+```
+
+```{r nb 5, results='hide'}
+evaluation_1590_nb <- imputations_performance(target1590, "dataset1590", "classif.naive_bayes") 
+```
+
+```{r f1 nb, results= 'markup'}
+# 1590, 188, 23381, 27, 29, 38, 4, 40536, 55, 56, 6332, 944
+f1_combined_nb<-as.data.frame(
+  rbind(
+  evaluation_1590_nb$f1,
+  evaluation_188_nb$f1,
+  #evaluation_23381$auc,
+  evaluation_27_nb$f1,
+  evaluation_29_nb$f1,
+  evaluation_38_nb$f1,
+  evaluation_4_nb$f1,
+  evaluation_40536_nb$f1,
+  #evaluation_41278_nb$f1,
+  evaluation_55_nb$f1,
+  evaluation_56_nb$f1,
+  evaluation_6332_nb$f1,
+  evaluation_944_nb$f1
+))
+colnames(f1_combined_nb)<-c('insert_mean','mice_pmm','vim_knn','vim_hotdeck','softImpute')
+f1_combined_nb<-cbind(data_name, f1_combined_nb)
+
+```
+
+```{r tab3, resuls='hide'}
+knitr::kable(f1_combined_nb, caption = "Tab.3. Naive Bayes results")
+```
+
+## Results KNN 
+
+```{r kknn 1, results='hide'}
+# numery wszystkich zbiorów: 1018, 1590, 188, 23381, 27, 29, 38, 4, 40536, 41278, 55, 56, 6332, 944
+
+# numery używanych obecnie: 1590, 188, 23381, 27, 29, 38, 4, 40536, 55, 56, 6332, 944
+
+###################### GIT ZBIORKI: 944, 56, 55, 38, 27, 188, 29, 4
+
+evaluation_944_kknn <- imputations_performance(target944, "dataset944", "classif.kknn")
+evaluation_56_kknn <- imputations_performance(target56, "dataset56", "classif.kknn") 
+evaluation_55_kknn <- imputations_performance(target55,  "dataset55", "classif.kknn")
+evaluation_38_kknn <- imputations_performance(target38,  "dataset38", "classif.kknn") # długi missForest 
+evaluation_27_kknn <- imputations_performance(target27,  "dataset27", "classif.kknn")
+evaluation_188_kknn <- imputations_performance(target188, "dataset188", "classif.kknn") 
+evaluation_29_kknn <- imputations_performance(target29, "dataset29", "classif.kknn") 
+# działa przy ustawieniu pmm w mice, inaczej nie
+evaluation_4_kknn <- imputations_performance(target4,  "dataset4", "classif.kknn") 
+# przy rm rows zeruje sie zbiór testowy, treningowy ma jeden wiersz
+
+############################### PROBLEMY: 1018
+# evaluation_1018 <- imputations_performance(dataset1018,target1018)
+# przy rm rows zeruje sie zbiór testowy
+# przy mice nie działa dla "pmm"
+
+
+```
+
+```{r kknn 2, results='hide'}
+evaluation_40536_kknn <- imputations_performance(target40536,  "dataset40536", "classif.kknn")
+```
+
+```{r kknn 3, results='hide'}
+# evaluation_23381 <- imputations_performance(target23381, "dataset23381", "classif.kknn") # nie działa :( 
+```
+
+```{r kknn 4, results='hide'}
+### do sprawdzenia, długo sie robi ale moze pojdzie 
+evaluation_6332_kknn <- imputations_performance(target6332, "dataset6332", "classif.kknn") 
+# jak pojdzie to odkomentowac w miarach !!!
+# błąd - missing data in columns
+```
+
+```{r kknn 5, results='hide'}
+evaluation_1590_kknn <- imputations_performance(target1590, "dataset1590", "classif.kknn") 
+```
+
+```{r f1 kknn, results= 'markup'}
+# 1590, 188, 23381, 27, 29, 38, 4, 40536, 55, 56, 6332, 944
+f1_combined_kknn<-as.data.frame(
+  rbind(
+  evaluation_1590_kknn$f1,
+  evaluation_188_kknn$f1,
+  #evaluation_23381$auc,
+  evaluation_27_kknn$f1,
+  evaluation_29_kknn$f1,
+  evaluation_38_kknn$f1,
+  evaluation_4_kknn$f1,
+  evaluation_40536_kknn$f1,
+  #evaluation_41278_kknn$f1,
+  evaluation_55_kknn$f1,
+  evaluation_56_kknn$f1,
+  evaluation_6332_kknn$f1,
+  evaluation_944_kknn$f1
+))
+colnames(f1_combined_kknn)<-c('insert_mean','mice_pmm','vim_knn','vim_hotdeck','softImpute')
+f1_combined_kknn<-cbind(data_name, f1_combined_kknn)
+
+```
+
+```{r tab4, resuls='hide'}
+knitr::kable(f1_combined_kknn, caption = "Tab.4. KNN results")
 ```
 
 # References 
