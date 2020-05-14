@@ -58,10 +58,10 @@ save_to_file <- function(data, target, data_name) {
   # else{
   imp1 <- mice(data_train_mice, method = "pmm", m = 1, maxit = 1, nnet.MaxNWts=3000)
   data_train_mice <- mice::complete(imp1)
-  data_train_mice <- imputeMissings::impute(data_train_mice)
+  # data_train_mice <- imputeMissings::impute(data_train_mice)
   imp2 <- mice(data_test_mice, method = "pmm", m = 1, maxit = 1, nnet.MaxNWts=3000)
   data_test_mice <- mice::complete(imp2)
-  data_test_mice <- imputeMissings::impute(data_test_mice)
+  # data_test_mice <- imputeMissings::impute(data_test_mice)
   print("mice")
   write.csv2(data_train_mice,paste0("./files/",data_name,"/train_mice.csv"), row.names = FALSE)
   write.csv2(data_test_mice,paste0("./files/",data_name,"/test_mice.csv"), row.names = FALSE)
@@ -108,7 +108,7 @@ save_to_file(dataset29,target29,"dataset29") # done # missings
 save_to_file(dataset38,target38,"dataset38") # done
 save_to_file(dataset4,target4,"dataset4") # done # missings
 save_to_file(dataset40536,target40536,"dataset40536") # done
-save_to_file(dataset41278,target41278,"dataset41278") # done # ?
+# save_to_file(dataset41278,target41278,"dataset41278") # done # ?
 save_to_file(dataset55,target55,"dataset55") # done
 save_to_file(dataset56,target56,"dataset56") # done
 save_to_file(dataset6332,target6332,"dataset6332") # done # missings

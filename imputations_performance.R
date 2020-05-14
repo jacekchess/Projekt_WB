@@ -69,7 +69,16 @@ imputations_performance <- function(target, data_name, model_name) {
   train_softImpute[,target]<-as.factor(train_softImpute[, target])
   
   perf_insert_mean <- model(test_mean, train_mean, model_name)
-  perf_mice <- model(test_mice, train_mice, model_name)
+  
+  # Jesli mice nie zadziala to daje NA
+  perf_mice <- tryCatch(
+    {
+      model(test_mice, train_mice, model_name)
+    },
+    error=function(cond) {
+      return(NA)
+    }
+  )
   perf_vim_knn <- model(test_vim_knn,train_vim_knn, model_name)
   perf_vim_hotdeck <- model(test_vim_hotdeck, train_vim_hotdeck, model_name)
   perf_softImpute <- model(test_softImpute,train_softImpute, model_name)

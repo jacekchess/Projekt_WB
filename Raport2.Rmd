@@ -6,12 +6,13 @@ output: html_document
 ---
 
 ```{r setup, include=TRUE, warning=FALSE, echo=FALSE, resuls='hide', include=FALSE}
-knitr::opts_chunk$set(echo = FALSE, warning=FALSE, message=FALSE, cache=TRUE)
+knitr::opts_chunk$set(echo = FALSE, warning=FALSE, message=FALSE, cache=FALSE)
 library(tidyverse)
 library(reshape2)
 library(dplyr)
 library(xgboost)
 library(kknn)
+library(purrr)
 source('imputations_performance.R')
 source('load_datasets.R')
 ```
@@ -121,6 +122,7 @@ evaluation_188_rpart <- imputations_performance(target188, "dataset188", "classi
 evaluation_29_rpart <- imputations_performance(target29, "dataset29", "classif.rpart") 
 # działa przy ustawieniu pmm w mice, inaczej nie
 evaluation_4_rpart <- imputations_performance(target4,  "dataset4", "classif.rpart") 
+# evaluation_4_rpart <- rep(NA, 5)
 # przy rm rows zeruje sie zbiór testowy, treningowy ma jeden wiersz
 
 ############################### PROBLEMY: 1018
@@ -177,6 +179,7 @@ f1_combined_rpart<-as.data.frame(
   evaluation_29_rpart$f1,
   evaluation_38_rpart$f1,
   evaluation_4_rpart$f1,
+  # evaluation_4_rpart,
   evaluation_40536_rpart$f1,
   #evaluation_41278_rpart$f1,
   evaluation_55_rpart$f1,
@@ -184,6 +187,7 @@ f1_combined_rpart<-as.data.frame(
   evaluation_6332_rpart$f1,
   evaluation_944_rpart$f1
 ))
+rownames(f1_combined_rpart) <- NULL
 colnames(f1_combined_rpart)<-c('insert_mean','mice_pmm','vim_knn','vim_hotdeck','softImpute')
 f1_combined_rpart<-cbind(data_name, f1_combined_rpart)
 
@@ -191,6 +195,31 @@ f1_combined_rpart<-cbind(data_name, f1_combined_rpart)
 
 ```{r tab2, resuls='hide'}
 knitr::kable(f1_combined_rpart, caption = "Tab.2. Rpart results")
+```
+
+## Rating Rpart
+
+```{r rating1, results='hide'}
+rating_rpart <- reshape2::melt(f1_combined_rpart)
+
+df <- transpose(f1_combined_rpart[, -1], keep.names = "variable")
+mean <- colMeans(f1_combined_rpart[, -1])
+min <- apply(f1_combined_rpart[, -1], 2, min)
+max <- apply(f1_combined_rpart[, -1], 2, max)
+df <- cbind(df, mean, min, max)
+
+df <- df %>%
+  mutate(rank_min = dense_rank(min)) %>%
+  mutate(rank_mean = dense_rank(mean)) %>%
+  mutate(rank_max = dense_rank(max)) %>%
+  mutate(value = rowSums(.[16:18])/15)
+
+ggplot(rating_rpart, aes(x = variable, y = value)) +
+  geom_boxplot() +
+  geom_point(data = df[, c(1, 19)], aes(x = variable, y = value, color = 'red')) +
+  theme(axis.title.x = element_blank(),
+        axis.title.y = element_blank())
+  
 ```
 
 ## Results Naive Bayes
@@ -211,6 +240,7 @@ evaluation_188_nb <- imputations_performance(target188, "dataset188", "classif.n
 evaluation_29_nb <- imputations_performance(target29, "dataset29", "classif.naive_bayes") 
 # działa przy ustawieniu pmm w mice, inaczej nie
 evaluation_4_nb <- imputations_performance(target4,  "dataset4", "classif.naive_bayes") # BŁĄD
+# evaluation_4_nb <- rep(NA, 5)
 # przy rm rows zeruje sie zbiór testowy, treningowy ma jeden wiersz
 
 ############################### PROBLEMY: 1018
@@ -251,6 +281,7 @@ f1_combined_nb<-as.data.frame(
   evaluation_29_nb$f1,
   evaluation_38_nb$f1,
   evaluation_4_nb$f1,
+  # evaluation_4_nb,
   evaluation_40536_nb$f1,
   #evaluation_41278_nb$f1,
   evaluation_55_nb$f1,
@@ -258,6 +289,7 @@ f1_combined_nb<-as.data.frame(
   evaluation_6332_nb$f1,
   evaluation_944_nb$f1
 ))
+rownames(f1_combined_nb) <- NULL
 colnames(f1_combined_nb)<-c('insert_mean','mice_pmm','vim_knn','vim_hotdeck','softImpute')
 f1_combined_nb<-cbind(data_name, f1_combined_nb)
 
@@ -277,8 +309,10 @@ evaluation_55_ranger <- imputations_performance(target55,  "dataset55", "classif
 evaluation_38_ranger <- imputations_performance(target38,  "dataset38", "classif.ranger")  
 evaluation_27_ranger <- imputations_performance(target27,  "dataset27", "classif.ranger") 
 evaluation_188_ranger <- imputations_performance(target188, "dataset188", "classif.ranger") 
-evaluation_29_ranger <- imputations_performance(target29, "dataset29", "classif.ranger")  
-evaluation_4_ranger <- imputations_performance(target4,  "dataset4", "classif.ranger") ##### RZUCA DZIWNY BŁĄD
+evaluation_29_ranger <- imputations_performance(target29, "dataset29", "classif.ranger")
+evaluation_4_ranger <- imputations_performance(target4,  "dataset4", "classif.ranger")
+# evaluation_4_ranger <- rep(NA, 5)
+##### RZUCA DZIWNY BŁĄD
 
 ############################### PROBLEMY: 1018
 # evaluation_1018 <- imputations_performance(dataset1018,target1018)
@@ -315,6 +349,7 @@ f1_combined_ranger<-as.data.frame(
   evaluation_29_ranger$f1,
   evaluation_38_ranger$f1,
   evaluation_4_ranger$f1,
+  # evaluation_4_ranger,
   evaluation_40536_ranger$f1,
   #evaluation_41278_ranger$f1,
   evaluation_55_ranger$f1,
@@ -322,6 +357,7 @@ f1_combined_ranger<-as.data.frame(
   evaluation_6332_ranger$f1,
   evaluation_944_ranger$f1
 ))
+rownames(f1_combined_ranger) <- NULL
 colnames(f1_combined_ranger)<-c('insert_mean','mice_pmm','vim_knn','vim_hotdeck','softImpute')
 f1_combined_ranger<-cbind(data_name, f1_combined_ranger)
 
@@ -344,7 +380,7 @@ evaluation_27_lda <- imputations_performance(target27,  "dataset27", "classif.ld
 evaluation_188_lda <- imputations_performance(target188, "dataset188", "classif.lda")
 evaluation_29_lda <- imputations_performance(target29, "dataset29", "classif.lda") 
 evaluation_4_lda <- imputations_performance(target4,  "dataset4", "classif.lda") # TEN SAM BŁĄD CO WYŻEJ 
-
+# evaluation_4_lda <- rep(NA, 5)
 ############################### PROBLEMY: 1018
 # evaluation_1018 <- imputations_performance(dataset1018,target1018)
 # przy rm rows zeruje sie zbiór testowy
@@ -383,6 +419,7 @@ f1_combined_lda<-as.data.frame(
   evaluation_29_lda$f1,
   evaluation_38_lda$f1,
   evaluation_4_lda$f1,
+  # evaluation_4_lda,
   evaluation_40536_lda$f1,
   #evaluation_41278_lda$f1,
   evaluation_55_lda$f1,
@@ -390,6 +427,7 @@ f1_combined_lda<-as.data.frame(
   evaluation_6332_lda$f1,
   evaluation_944_lda$f1
 ))
+rownames(f1_combined_lda) <- NULL
 colnames(f1_combined_lda)<-c('insert_mean','mice_pmm','vim_knn','vim_hotdeck','softImpute')
 f1_combined_lda<-cbind(data_name, f1_combined_lda)
 
@@ -411,6 +449,7 @@ evaluation_27_kknn <- imputations_performance(target27,  "dataset27", "classif.k
 evaluation_188_kknn <- imputations_performance(target188, "dataset188", "classif.kknn") 
 evaluation_29_kknn <- imputations_performance(target29, "dataset29", "classif.kknn")
 evaluation_4_kknn <- imputations_performance(target4,  "dataset4", "classif.kknn")  # BŁAD
+# evaluation_4_kknn <- rep(NA, 5)
 
 ############################### PROBLEMY: 1018
 # evaluation_1018 <- imputations_performance(dataset1018,target1018)
@@ -450,6 +489,7 @@ f1_combined_kknn<-as.data.frame(
   evaluation_29_kknn$f1,
   evaluation_38_kknn$f1,
   evaluation_4_kknn$f1,
+  # evaluation_4_kknn,
   evaluation_40536_kknn$f1,
   #evaluation_41278_kknn$f1,
   evaluation_55_kknn$f1,
@@ -457,6 +497,7 @@ f1_combined_kknn<-as.data.frame(
   evaluation_6332_kknn$f1,
   evaluation_944_kknn$f1
 ))
+rownames(f1_combined_kknn) <- NULL
 colnames(f1_combined_kknn)<-c('insert_mean','mice_pmm','vim_knn','vim_hotdeck','softImpute')
 f1_combined_kknn<-cbind(data_name, f1_combined_kknn)
 
@@ -465,6 +506,8 @@ f1_combined_kknn<-cbind(data_name, f1_combined_kknn)
 ```{r tab6, resuls='hide'}
 knitr::kable(f1_combined_kknn, caption = "Tab.6. KNN results")
 ```
+
+
 
 # References 
 
