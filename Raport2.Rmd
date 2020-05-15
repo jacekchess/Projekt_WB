@@ -100,6 +100,7 @@ Five different algorithms were chosen, two linear classifiers (NB, LDA), two tre
   Constructs a large number of individual decision trees that operate as an ensemble, each individual tree returns a class prediction and the class that is the mode of the classes (in case of classification) of the individual trees becomes our model’s prediction.
   
 * **LDA (Linear Discriminant Analysis)**\
+  Based on dimension reduction technique, finds a new feature space to project the data in order to maximize classes separability. More precisely, it finds a linear combination of features that characterizes or separates two or more classes of objects or events. The resulting combination is used as a linear classifier, which uses Bayes’ Theorem to estimate probabilities of belonging to respective classes.
 
 * **KNN (k-Nearest Neighbour)**\
   An object is classified by a majority vote of its neighbors, being assigned to the class most common among its k nearest neighbors. The neighbours are measured by a distance function.
