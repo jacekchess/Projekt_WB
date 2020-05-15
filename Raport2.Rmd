@@ -229,7 +229,18 @@ ranking<-function(f1_combined){
 
 ```
 
+```{r}
 
+f1_combined<-f1_combined_lda
+
+ranking1<-function(f1_combined){
+  ranks<-as.data.frame(lapply(f1_combined_ranger%>%select(-data_name), dense_rank))%>%
+    mutate(data_name=f1_combined$data_name)
+  
+  ranks[is.na(ranks)]<-11
+}
+
+```
 
 ## Rating Rpart
 
