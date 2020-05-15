@@ -6,7 +6,7 @@ output: html_document
 ---
 
 ```{r setup, include=TRUE, warning=FALSE, echo=FALSE, resuls='hide', include=FALSE}
-knitr::opts_chunk$set(echo = FALSE, warning=FALSE, message=FALSE, cache=FALSE)
+knitr::opts_chunk$set(echo = FALSE, warning=FALSE, message=FALSE, cache=TRUE)
 library(tidyverse)
 library(reshape2)
 library(dplyr)
@@ -120,7 +120,13 @@ The performance is checked using **F1 Measure** -  the harmonic mean of the prec
  
  $$F_1=2*\frac{precision*recall}{precision+recall}$$
  
-Due to that measure .... <RANKING>
+Due to that measure a ranking of imputations for each dataset is created. Imputations are given ranks from 1 to 5:
+
+ * if imputations have the same F1 measure, they receive the same rank
+ 
+ * if imputation method failed to impute the data, it receives rank 5
+ 
+The overall measure of the imputation performance is a mean of it's ranks from all datasets.
  
 
 ## Results

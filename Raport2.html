@@ -467,14 +467,6 @@ summary {
 <td align="right">0.05</td>
 </tr>
 <tr class="even">
-<td align="left">6332</td>
-<td align="left">cylinder-bands</td>
-<td align="right">540</td>
-<td align="right">34</td>
-<td align="right">999</td>
-<td align="right">0.05</td>
-</tr>
-<tr class="odd">
 <td align="left">944</td>
 <td align="left">echoMonths</td>
 <td align="right">130</td>
@@ -511,7 +503,7 @@ Technique based on an assumption of independence between predictors (every pair 
 <li><p><strong>Ranger (Random forest)</strong><br />
 Constructs a large number of individual decision trees that operate as an ensemble, each individual tree returns a class prediction and the class that is the mode of the classes (in case of classification) of the individual trees becomes our model’s prediction.</p></li>
 <li><p><strong>LDA (Linear Discriminant Analysis)</strong><br />
-</p></li>
+Based on dimension reduction technique, finds a new feature space to project the data in order to maximize classes separability. More precisely, it finds a linear combination of features that characterizes or separates two or more classes of objects or events. The resulting combination is used as a linear classifier, which uses Bayes’ Theorem to estimate probabilities of belonging to respective classes.</p></li>
 <li><p><strong>KNN (k-Nearest Neighbour)</strong><br />
 An object is classified by a majority vote of its neighbors, being assigned to the class most common among its k nearest neighbors. The neighbours are measured by a distance function.</p></li>
 </ul>
@@ -528,7 +520,12 @@ An object is classified by a majority vote of its neighbors, being assigned to t
 </ul>
 <p>The performance is checked using <strong>F1 Measure</strong> - the harmonic mean of the precision and recall.</p>
 <p><span class="math display">\[F_1=2*\frac{precision*recall}{precision+recall}\]</span></p>
-<p>Due to that measure …. <RANKING></p>
+<p>Due to that measure a ranking of imputations for each dataset is created. Imputations are given ranks from 1 to 5:</p>
+<ul>
+<li><p>if imputations have the same F1 measure, they receive the same rank</p></li>
+<li><p>if imputation method failed to impute the data, it receives rank 5</p></li>
+</ul>
+<p>The overall measure of the imputation performance is a mean of it’s ranks from all datasets.</p>
 </div>
 </div>
 <div id="results" class="section level2">
@@ -621,14 +618,6 @@ An object is classified by a majority vote of its neighbors, being assigned to t
 <td align="right">0.9649123</td>
 </tr>
 <tr class="even">
-<td align="left">cylinder-bands</td>
-<td align="right">0.7323944</td>
-<td align="right">0.7222222</td>
-<td align="right">0.7323944</td>
-<td align="right">0.7323944</td>
-<td align="right">0.7323944</td>
-</tr>
-<tr class="odd">
 <td align="left">echoMonths</td>
 <td align="right">0.7741935</td>
 <td align="right">0.8125000</td>
