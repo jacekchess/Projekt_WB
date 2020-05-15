@@ -88,21 +88,22 @@ The imputations, that were performed and analyzed include:
 
 ### Implementation
 
-To conduct the experiment a function **evaluate_imputations()** placed in the script with the same name was implemented. The function receives as arguments:
-
-* a single dataset to impute 
-* a name of the target variable
+To conduct the experiment two functions were written:
+ - **save_files()** - takes a dataset, divides it into train and test datasets, imputes them in 5 ways described above and saves the imputed datasets into files
 
 Dataset is splitted into train set (80% of observation) and train set (20% of observation).
 They are imputed separately, using methods described above, in order do avoid data leakage.
-Afterwards modelling is performed, using mlr3 package.Recursive Partitioning And Regression Trees learner is trained on train set and then prediction on test set are made. 
-Two evaluate the model performance two metrics are used:
 
-* **F1**\
+- **imputations_performance()** - takes dataset name and classification algorithm, returns performance of each dataset imputation combined with this algorithm
+The performance is checked using:
+
+ **F1 Measure** -  is the harmonic mean of the precision and recall
  
- .... <- UZUPEŁNIĆ
+ $$F_1=2*\frac{precision*recall}{precision+recall}$$
+ 
 
-The function returns a matrix with 5 described imputations as rows and 2 performance measures as columns.
+
+
 
 ## Results Rpart
 
@@ -197,26 +198,49 @@ f1_combined_rpart<-cbind(data_name, f1_combined_rpart)
 knitr::kable(f1_combined_rpart, caption = "Tab.2. Rpart results")
 ```
 
+```{r rating function}
+
+ranking<-function(f1_combined){
+  
+
+  df <- transpose(f1_combined[, -1], keep.names = "variable")
+  mean <- colMeans(f1_combined[, -1])
+  min <- apply(f1_combined[, -1], 2, min)
+  max <- apply(f1_combined[, -1], 2, max)
+  df <- cbind(df, mean, min, max)
+  
+  df <- df %>%
+    mutate(rank_min = dense_rank(min)) %>%
+    mutate(rank_mean = dense_rank(mean)) %>%
+    mutate(rank_max = dense_rank(max)) %>%
+    mutate(value = rowSums(.[16:18])/15)
+  
+  df_ranks<-df%>%
+    arrange(desc(value))%>%
+    cbind(ranks=c(1,2,3,4,5))%>%
+    select(variable, ranks)
+  
+  df<-df%>%
+    inner_join(df_ranks, by=c("variable"="variable"))
+  
+  return(df)
+}
+
+
+```
+
+
+
 ## Rating Rpart
 
-```{r rating1, results='hide'}
+```{r rating rpart, results='hide'}
+
 rating_rpart <- reshape2::melt(f1_combined_rpart)
-
-df <- transpose(f1_combined_rpart[, -1], keep.names = "variable")
-mean <- colMeans(f1_combined_rpart[, -1])
-min <- apply(f1_combined_rpart[, -1], 2, min)
-max <- apply(f1_combined_rpart[, -1], 2, max)
-df <- cbind(df, mean, min, max)
-
-df <- df %>%
-  mutate(rank_min = dense_rank(min)) %>%
-  mutate(rank_mean = dense_rank(mean)) %>%
-  mutate(rank_max = dense_rank(max)) %>%
-  mutate(value = rowSums(.[16:18])/15)
+ranking_rpart<-ranking(f1_combined_rpart)
 
 ggplot(rating_rpart, aes(x = variable, y = value)) +
   geom_boxplot() +
-  geom_point(data = df[, c(1, 19)], aes(x = variable, y = value, color = 'red')) +
+  geom_point(data = ranking_rpart[, c(1, 19)], aes(x = variable, y = value, color = 'red')) +
   theme(axis.title.x = element_blank(),
         axis.title.y = element_blank())
   
@@ -299,6 +323,22 @@ f1_combined_nb<-cbind(data_name, f1_combined_nb)
 knitr::kable(f1_combined_nb, caption = "Tab.3. Naive Bayes results")
 ```
 
+## Rating Naive Bayes
+
+```{r rating nb, results='hide'}
+rating_nb <- reshape2::melt(f1_combined_nb)
+
+ranking_nb<-ranking(f1_combined_nb)
+
+ggplot(rating_nb, aes(x = variable, y = value)) +
+  geom_boxplot() +
+  geom_point(data = ranking_nb[, c(1, 19)], aes(x = variable, y = value, color = 'red')) +
+  theme(axis.title.x = element_blank(),
+        axis.title.y = element_blank())
+  
+```
+
+
 ## Results Ranger 
 
 ```{r ranger 1, results='hide'}
@@ -366,6 +406,23 @@ f1_combined_ranger<-cbind(data_name, f1_combined_ranger)
 ```{r tab4, resuls='hide'}
 knitr::kable(f1_combined_ranger, caption = "Tab.4. Ranger results")
 ```
+
+## Rating Ranger
+
+```{r rating ranger, results='hide'}
+rating_ranger <- reshape2::melt(f1_combined_ranger)
+
+ranking_ranger<-ranking(f1_combined_ranger)
+
+ggplot(rating_ranger, aes(x = variable, y = value)) +
+  geom_boxplot() +
+  geom_point(data = ranking_ranger[, c(1, 19)], aes(x = variable, y = value, color = 'red')) +
+  theme(axis.title.x = element_blank(),
+        axis.title.y = element_blank())
+  
+```
+
+
 
 ## Results LDA 
 
@@ -436,6 +493,21 @@ f1_combined_lda<-cbind(data_name, f1_combined_lda)
 ```{r tab5, resuls='hide'}
 knitr::kable(f1_combined_lda, caption = "Tab.5. LDA results")
 ```
+## Rating LDA
+
+```{r rating lda, results='hide'}
+rating_lda <- reshape2::melt(f1_combined_lda)
+
+ranking_lda<-ranking(f1_combined_lda)
+
+ggplot(rating_lda, aes(x = variable, y = value)) +
+  geom_boxplot() +
+  geom_point(data = ranking_lda[, c(1, 19)], aes(x = variable, y = value, color = 'red')) +
+  theme(axis.title.x = element_blank(),
+        axis.title.y = element_blank())
+  
+```
+
 
 ## Results KNN 
 
@@ -507,6 +579,38 @@ f1_combined_kknn<-cbind(data_name, f1_combined_kknn)
 knitr::kable(f1_combined_kknn, caption = "Tab.6. KNN results")
 ```
 
+##  Rating KNN
+
+```{r rating kknn, results='hide'}
+rating_kknn <- reshape2::melt(f1_combined_kknn)
+
+ranking_kknn<-ranking(f1_combined_kknn)
+
+ggplot(rating_kknn, aes(x = variable, y = value)) +
+  geom_boxplot() +
+  geom_point(data = ranking_kknn[, c(1, 19)], aes(x = variable, y = value, color = 'red')) +
+  theme(axis.title.x = element_blank(),
+        axis.title.y = element_blank())
+  
+```
+
+# Rating summary
+
+```{r rating summary}
+
+ranking_combined<-as.data.frame(rbind(
+  ranking_rpart$ranks,
+  ranking_nb$ranks,
+  ranking_ranger$ranks,
+  ranking_lda$ranks,
+  ranking_kknn$ranks), row.names = c("rpart", "naiveBayes", "ranger", "LDA", "kknn"))
+colnames(ranking_combined)<-ranking_rpart$variable
+
+
+
+heatmap(as.matrix(ranking_combined))
+
+```
 
 
 # References 
