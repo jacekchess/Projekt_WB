@@ -21,8 +21,8 @@ source('load_datasets.R')
 
 Imputation of missing values is a common step of machine learning process and sometimes a difficult problem. Many real-life datasets contain incomplete observations and dealing with them is key part of modelling as most of the algorithms provided by widely used R packages (for instance caret or mlr) require complete data.
 The aim of this report is to measure the influence of five different imputation methods on the performance of a selected classification model. Simple, common methods such as basic mean, median and mode are compared with advanced imputation techniques from specialized R packages - mice, VIM and softImpute.
-As a tested algorithm, Recursive Partitioning And Regression Trees was chosen.
-It's prediction effectiveness is assessed by AUC (area under the ROC curve) and BACC (Balanced Accuracy) to provide a proper measure for both balanced and imbalanced data.\
+As a tested algorithms, Recursive Partitioning And Regression Trees, Naive Bayes, Ranger (Random forest),  Linear Discriminant Analysis and k-Nearest Neighbours were chosen.
+It's prediction effectiveness is assessed by F1 measure (also called F1 score) to provide a proper measure for both balanced and imbalanced data.\
 
 ## Introduction 
 
@@ -31,7 +31,7 @@ There are many methods which allow to handle this issue.
 Firstly, there are basic ones such as removing rows or imputing with mean or mode, which are fast and easy to implement, however they do not guarantee a very good performance. On the other hand, many sophisticated strategies exist, e.g. using tree-based models, which usually result in better models, but enhance algorithm's complexity and computional time.
 In this paper the quality of 5 different approaches to data imputation is compared, and their impact on binary classification data modelling is assessed.
 Summary of the results presents which imputations contributed to achiving the best model's predictions. 
-To achieve the goal of this study the following experiment will be conducted on 10 datasets, gathered mostly from OpenML and some from the imputation packages.
+To achieve the goal of this study the following experiment will be conducted on 11 datasets, gathered mostly from OpenML and some from the imputation packages.
 
 ## Methodology 
 
@@ -85,27 +85,46 @@ The imputations, that were performed and analyzed include:
 
 * **softImpute combined with median/mode imputation**\
   For numeric variables function softImpute() from softImpute package is used, fitting a low-rank matrix approximation to a matrix with missing values via nuclear-norm regularization. For remaining variables missing values are imputed with median or mode, which is implemented with impute() function from imputeMissings() package.
+  
+### Classification algorithms
+
+Five different algorithms were chosen, two linear classifiers (NB, LDA), two tree-based models (RPART, Ranger) and one kernel estimation (KNN) were tested after every imputation on every dataset. The modelling was performed using mlr3 package.
+
+* **RPART (Recursive Partitioning And Regression Trees)**\
+  Based on decision trees, works by splitting the dataset recursively, until a predetermined termination criterion is reached or no improvement can be made.  At each step, the split is made based on the independent variable that splits the data best (results in the largest possible reduction in heterogeneity of the dependent (predicted) variable).
+  
+* **NB (Naive Bayes)**\
+  Technique based on an assumption of independence between predictors (every pair of features being classified is independent of each other) and their equal contribution to the outcome, then the probability of an event occurring given the probability of another event that has already occurred is calculated.
+  
+* **Ranger (Random forest)**\
+  Constructs a large number of individual decision trees that operate as an ensemble, each individual tree returns a class prediction and the class that is the mode of the classes (in case of classification) of the individual trees becomes our model’s prediction.
+  
+* **LDA (Linear Discriminant Analysis)**\
+
+* **KNN (k-Nearest Neighbour)**\
+  An object is classified by a majority vote of its neighbors, being assigned to the class most common among its k nearest neighbors. The neighbours are measured by a distance function.
 
 ### Implementation
 
 To conduct the experiment two functions were written:
- - **save_files()** - takes a dataset, divides it into train and test datasets, imputes them in 5 ways described above and saves the imputed datasets into files
+
+ * **save_files()** - takes a dataset, divides it into train and test datasets, imputes them in 5 ways described above and saves the imputed datasets into files
 
 Dataset is splitted into train set (80% of observation) and train set (20% of observation).
 They are imputed separately, using methods described above, in order do avoid data leakage.
 
-- **imputations_performance()** - takes dataset name and classification algorithm, returns performance of each dataset imputation combined with this algorithm
-The performance is checked using:
+ * **imputations_performance()** - takes dataset name and classification algorithm, returns performance of each dataset imputation combined with this algorithm
 
- **F1 Measure** -  is the harmonic mean of the precision and recall
+The performance is checked using **F1 Measure** -  the harmonic mean of the precision and recall.
  
  $$F_1=2*\frac{precision*recall}{precision+recall}$$
  
+Due to that measure .... <RANKING>
+ 
 
+## Results
 
-
-
-## Results Rpart
+### Results Rpart
 
 ```{r small data, results='hide'}
 # numery wszystkich zbiorów: 1018, 1590, 188, 23381, 27, 29, 38, 4, 40536, 41278, 55, 56, 6332, 944
@@ -242,7 +261,7 @@ ranking1<-function(f1_combined){
 
 ```
 
-## Rating Rpart
+### Rating Rpart
 
 ```{r rating rpart, results='hide'}
 
@@ -257,7 +276,7 @@ ggplot(rating_rpart, aes(x = variable, y = value)) +
   
 ```
 
-## Results Naive Bayes
+### Results Naive Bayes
 
 ```{r nb 1, results='hide'}
 # numery wszystkich zbiorów: 1018, 1590, 188, 23381, 27, 29, 38, 4, 40536, 41278, 55, 56, 6332, 944
@@ -334,7 +353,7 @@ f1_combined_nb<-cbind(data_name, f1_combined_nb)
 knitr::kable(f1_combined_nb, caption = "Tab.3. Naive Bayes results")
 ```
 
-## Rating Naive Bayes
+### Rating Naive Bayes
 
 ```{r rating nb, results='hide'}
 rating_nb <- reshape2::melt(f1_combined_nb)
@@ -350,7 +369,7 @@ ggplot(rating_nb, aes(x = variable, y = value)) +
 ```
 
 
-## Results Ranger 
+### Results Ranger 
 
 ```{r ranger 1, results='hide'}
 
@@ -418,7 +437,7 @@ f1_combined_ranger<-cbind(data_name, f1_combined_ranger)
 knitr::kable(f1_combined_ranger, caption = "Tab.4. Ranger results")
 ```
 
-## Rating Ranger
+### Rating Ranger
 
 ```{r rating ranger, results='hide'}
 rating_ranger <- reshape2::melt(f1_combined_ranger)
@@ -435,7 +454,7 @@ ggplot(rating_ranger, aes(x = variable, y = value)) +
 
 
 
-## Results LDA 
+### Results LDA 
 
 ```{r lda 1, results='hide'}
 
@@ -504,7 +523,8 @@ f1_combined_lda<-cbind(data_name, f1_combined_lda)
 ```{r tab5, resuls='hide'}
 knitr::kable(f1_combined_lda, caption = "Tab.5. LDA results")
 ```
-## Rating LDA
+
+### Rating LDA
 
 ```{r rating lda, results='hide'}
 rating_lda <- reshape2::melt(f1_combined_lda)
@@ -520,7 +540,7 @@ ggplot(rating_lda, aes(x = variable, y = value)) +
 ```
 
 
-## Results KNN 
+### Results KNN 
 
 ```{r kknn 1, results='hide'}
 
@@ -590,7 +610,7 @@ f1_combined_kknn<-cbind(data_name, f1_combined_kknn)
 knitr::kable(f1_combined_kknn, caption = "Tab.6. KNN results")
 ```
 
-##  Rating KNN
+###  Rating KNN
 
 ```{r rating kknn, results='hide'}
 rating_kknn <- reshape2::melt(f1_combined_kknn)
@@ -605,7 +625,7 @@ ggplot(rating_kknn, aes(x = variable, y = value)) +
   
 ```
 
-# Rating summary
+## Rating summary
 
 ```{r rating summary}
 
@@ -624,7 +644,7 @@ heatmap(as.matrix(ranking_combined))
 ```
 
 
-# References 
+## References 
 
 1. mice package https://cran.r-project.org/web/packages/mice/index.html
 
