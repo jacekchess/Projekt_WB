@@ -564,25 +564,15 @@ ggplot(f1_point_data, aes(x = data_name, y = value, color = variable)) +
 
 ## Numer of missing values
 
-With imputation was the best on given dataset by number of missing
+Taking only datasets with high number of missing into consideration.
 
-```{r missing analisys}
+```{r missing set}
 missing<-datasets1%>%select(data_nr,data_name, procent_missing)%>%
   filter(data_nr %in% c(23381, 27,4,41278))
+knitr::kable(missing, caption = "Tab.7. Datasets with most missing values")
+```
 
-ranking_mis<-function(f1_combined){
-  df <- transpose(f1_combined[, -1], keep.names = "imputation")
-  ranks<-as.data.frame(lapply(df%>%select(-imputation), dense_rank))%>%
-    mutate(imputation=df$imputation)
-  ranks[is.na(ranks)]<-5
-  n<-ncol(ranks)
-  ranks<-ranks%>%select(n, 1:n-1)
-  #colnames(ranks)<-c("imputation",data_name)
-  
-  ranks<-cbind(ranks, mean=rowMeans(ranks[2:15]))
-  
-  return(ranks)
-}
+```{r missing vis}
 ranking_rpart_mis<-ranking(f1_combined_rpart%>%filter(data_name %in% c('dresses-sales', 'colic', 'labor', 'stem-okcupid')))
 ranking_lda_mis<-ranking(f1_combined_lda%>%filter(data_name %in% c('dresses-sales', 'colic', 'labor', 'stem-okcupid')))
 ranking_ranger_mis<-ranking(f1_combined_ranger%>%filter(data_name %in% c('dresses-sales', 'colic', 'labor', 'stem-okcupid')))
