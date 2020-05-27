@@ -13,6 +13,10 @@ library(imputeMissings)
 
 imputations_performance <- function(target, data_name, model_name) {
   # przyjmuje target, nazwę zbioru (string) oraz rodzaj modelu do wytrenowania na wszystkich imputacjach tego zbioru
+  if((data_name == "dataset1018" && model_name == "classif.rpart") ||
+     (data_name == "dataset23381" && (model_name == "classif.rpart" || model_name == "classif.lda"))) {
+    return(rep(NA, 5))
+  }
   
   model <- function(data_test, data_train, model_name) {
     # takes test and train dataset and performs rpart modelling

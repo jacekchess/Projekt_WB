@@ -40,11 +40,11 @@ In the following table are presented the datasets used for this experiment, alon
 
 ```{r dataset table, results='hide'}
 library(dplyr)
-data_nr <- c("1590", "188", "27", "29", "38", "4", "40536", "55", "56", "6332", "944")
-data_name <- c("adult", "eucalyptus", "colic", "credit-approval", "sick", "labor", "SpeedDating", "hepatitis", "vote", "cylinder-bands", "echoMonths" )
-nr_instances <- c(48842, 736, 368, 690, 3772, 57, 8378, 155, 435, 540, 130)
-nr_features <- c(13, 16, 20, 16, 28, 17, 123, 20, 17, 34, 10)
-nr_missing<-c(6465, 455, 1199, 67, 2293, 326, 18570, 167, 392, 999, 97)
+data_nr <- c("1590", "188", "27", "29", "38", "4", "40536", "55", "56", "6332", "944", "1018", "23381")
+data_name <- c("adult", "eucalyptus", "colic", "credit-approval", "sick", "labor", "SpeedDating", "hepatitis", "vote", "cylinder-bands", "echoMonths", "ipums_la_99-small", "dresses-sales")
+nr_instances <- c(48842, 736, 368, 690, 3772, 57, 8378, 155, 435, 540, 130, 8844, 500)
+nr_features <- c(13, 16, 20, 16, 28, 17, 123, 20, 17, 34, 10, 57, 13)
+nr_missing<-c(6465, 455, 1199, 67, 2293, 326, 18570, 167, 392, 999, 97, 34843, 835)
 
 datasets <- data.frame(cbind(data_nr, 
                      data_name, 
@@ -144,9 +144,9 @@ evaluation_38_rpart <- imputations_performance(target38,  "dataset38", "classif.
 evaluation_27_rpart <- imputations_performance(target27,  "dataset27", "classif.rpart")
 evaluation_188_rpart <- imputations_performance(target188, "dataset188", "classif.rpart") 
 evaluation_29_rpart <- imputations_performance(target29, "dataset29", "classif.rpart") 
-evaluation_4_rpart <- imputations_performance(target4,  "dataset4", "classif.rpart") 
-
-#evaluation_1018_rpart <- imputations_performance(target1018, "dataset1018", "classif.rpart")
+evaluation_4_rpart <- imputations_performance(target4,  "dataset4", "classif.rpart")
+evaluation_1018_rpart <- imputations_performance(target1018, "dataset1018", "classif.rpart")
+evaluation_23381_rpart <- imputations_performance(target23381, "dataset23381", "classif.rpart")
 ```
 
 ```{r big data 1, results='hide'}
@@ -176,10 +176,8 @@ evaluation_1590_rpart <- imputations_performance(target1590, "dataset1590", "cla
 # 1590, 188, 27, 29, 38, 4, 40536, 55, 56, 6332, 944
 f1_combined_rpart<-as.data.frame(
   rbind(
-  #evaluation_1018_rpart$f1,
   evaluation_1590_rpart$f1,
   evaluation_188_rpart$f1,
-  #evaluation_23381_rpart$f1,
   evaluation_27_rpart$f1,
   evaluation_29_rpart$f1,
   evaluation_38_rpart$f1,
@@ -189,7 +187,9 @@ f1_combined_rpart<-as.data.frame(
   evaluation_55_rpart$f1,
   evaluation_56_rpart$f1,
   evaluation_6332_rpart$f1,
-  evaluation_944_rpart$f1
+  evaluation_944_rpart$f1,
+  evaluation_1018_rpart,
+  evaluation_23381_rpart
 ))
 rownames(f1_combined_rpart) <- NULL
 colnames(f1_combined_rpart)<-c('insert_mean','mice_pmm','vim_knn','vim_hotdeck','softImpute')
@@ -243,10 +243,10 @@ ranking<-function(f1_combined){
   ranks<-as.data.frame(lapply(df%>%select(-imputation), dense_rank))%>%
     mutate(imputation=df$imputation)
   ranks[is.na(ranks)]<-5
-  ranks<-ranks%>%select(12, 1:11)
+  ranks<-ranks%>%select(14, 1:13)
   colnames(ranks)<-c("imputation",data_name)
   
-  ranks<-cbind(ranks, mean=rowMeans(ranks[2:12]))
+  ranks<-cbind(ranks, mean=rowMeans(ranks[2:14]))
   
   return(ranks)
 }
@@ -280,8 +280,8 @@ evaluation_27_nb <- imputations_performance(target27,  "dataset27", "classif.nai
 evaluation_188_nb <- imputations_performance(target188, "dataset188", "classif.naive_bayes") 
 evaluation_29_nb <- imputations_performance(target29, "dataset29", "classif.naive_bayes") 
 evaluation_4_nb <- imputations_performance(target4,  "dataset4", "classif.naive_bayes")
-
-# evaluation_1018_nb <- imputations_performance(target1018,"dataset1018","classif.naive_bayes")
+evaluation_1018_nb <- imputations_performance(target1018,"dataset1018","classif.naive_bayes")
+evaluation_23381_nb <- imputations_performance(target23381,"dataset23381","classif.naive_bayes")
 ```
 
 ```{r nb 2, results='hide'}
@@ -304,7 +304,6 @@ evaluation_1590_nb <- imputations_performance(target1590, "dataset1590", "classi
 # 1590, 188, 27, 29, 38, 4, 40536, 55, 56, 6332, 944
 f1_combined_nb<-as.data.frame(
   rbind(
-  #evaluation_1018_nb$f1,
   evaluation_1590_nb$f1,
   evaluation_188_nb$f1,
   #evaluation_23381_nb$f1,
@@ -317,7 +316,9 @@ f1_combined_nb<-as.data.frame(
   evaluation_55_nb$f1,
   evaluation_56_nb$f1,
   evaluation_6332_nb$f1,
-  evaluation_944_nb$f1
+  evaluation_944_nb$f1,
+  evaluation_1018_nb$f1,
+  evaluation_23381_nb$f1
 ))
 rownames(f1_combined_nb) <- NULL
 colnames(f1_combined_nb)<-c('insert_mean','mice_pmm','vim_knn','vim_hotdeck','softImpute')
@@ -359,8 +360,8 @@ evaluation_27_ranger <- imputations_performance(target27,  "dataset27", "classif
 evaluation_188_ranger <- imputations_performance(target188, "dataset188", "classif.ranger") 
 evaluation_29_ranger <- imputations_performance(target29, "dataset29", "classif.ranger")
 evaluation_4_ranger <- imputations_performance(target4,  "dataset4", "classif.ranger")
-
-#evaluation_1018_ranger <- imputations_performance(target1018,"dataset1018","classif.ranger")
+evaluation_1018_ranger <- imputations_performance(target1018,"dataset1018","classif.ranger")
+evaluation_23381_ranger <- imputations_performance(target23381,"dataset23381","classif.ranger")
 ```
 
 ```{r ranger 2, results='hide'}
@@ -383,10 +384,8 @@ evaluation_1590_ranger <- imputations_performance(target1590, "dataset1590", "cl
 # 1590, 188, 27, 29, 38, 4, 40536, 55, 56, 6332, 944
 f1_combined_ranger<-as.data.frame(
   rbind(
-  #evaluation_1018_ranger$f1,
   evaluation_1590_ranger$f1,
   evaluation_188_ranger$f1,
-  #evaluation_23381_ranger$f1,
   evaluation_27_ranger$f1,
   evaluation_29_ranger$f1,
   evaluation_38_ranger$f1,
@@ -396,7 +395,9 @@ f1_combined_ranger<-as.data.frame(
   evaluation_55_ranger$f1,
   evaluation_56_ranger$f1,
   evaluation_6332_ranger$f1,
-  evaluation_944_ranger$f1
+  evaluation_944_ranger$f1,
+  evaluation_1018_ranger$f1,
+  evaluation_23381_ranger$f1
 ))
 rownames(f1_combined_ranger) <- NULL
 colnames(f1_combined_ranger)<-c('insert_mean','mice_pmm','vim_knn','vim_hotdeck','softImpute')
@@ -439,8 +440,8 @@ evaluation_27_lda <- imputations_performance(target27,  "dataset27", "classif.ld
 evaluation_188_lda <- imputations_performance(target188, "dataset188", "classif.lda")
 evaluation_29_lda <- imputations_performance(target29, "dataset29", "classif.lda") 
 evaluation_4_lda <- imputations_performance(target4,  "dataset4", "classif.lda")
-
-# evaluation_1018_lda <- imputations_performance(target1018, "dataset1018", "classif.lda")
+evaluation_1018_lda <- imputations_performance(target1018, "dataset1018", "classif.lda")
+evaluation_23381_lda <- imputations_performance(target23381, "dataset23381", "classif.lda")
 ```
 
 ```{r lda 2, results='hide'}
@@ -463,10 +464,8 @@ evaluation_1590_lda <- imputations_performance(target1590, "dataset1590", "class
 # 1590, 188, 27, 29, 38, 4, 40536, 55, 56, 6332, 944
 f1_combined_lda<-as.data.frame(
   rbind(
-  #evaluation_1018_lda$f1,
   evaluation_1590_lda$f1,
   evaluation_188_lda$f1,
-  #evaluation_23381_lda$f1,
   evaluation_27_lda$f1,
   evaluation_29_lda$f1,
   evaluation_38_lda$f1,
@@ -476,7 +475,9 @@ f1_combined_lda<-as.data.frame(
   evaluation_55_lda$f1,
   evaluation_56_lda$f1,
   evaluation_6332_lda$f1,
-  evaluation_944_lda$f1
+  evaluation_944_lda$f1,
+  evaluation_1018_lda$f1,
+  evaluation_23381_lda
 ))
 rownames(f1_combined_lda) <- NULL
 colnames(f1_combined_lda)<-c('insert_mean','mice_pmm','vim_knn','vim_hotdeck','softImpute')
@@ -518,8 +519,8 @@ evaluation_27_kknn <- imputations_performance(target27,  "dataset27", "classif.k
 evaluation_188_kknn <- imputations_performance(target188, "dataset188", "classif.kknn") 
 evaluation_29_kknn <- imputations_performance(target29, "dataset29", "classif.kknn")
 evaluation_4_kknn <- imputations_performance(target4,  "dataset4", "classif.kknn")  
-
-# evaluation_1018_kknn <- imputations_performance(target1018, "dataset1018", "classif.kknn")
+evaluation_1018_kknn <- imputations_performance(target1018, "dataset1018", "classif.kknn")
+evaluation_23381_kknn <- imputations_performance(target23381, "dataset23381", "classif.kknn")
 ```
 
 ```{r kknn 2, results='hide'}
@@ -542,10 +543,8 @@ evaluation_1590_kknn <- imputations_performance(target1590, "dataset1590", "clas
 # 1590, 188, 27, 29, 38, 4, 40536, 55, 56, 6332, 944
 f1_combined_kknn<-as.data.frame(
   rbind(
-  #evaluation_1018_kknn$f1,
   evaluation_1590_kknn$f1,
   evaluation_188_kknn$f1,
-  #evaluation_23381_kknn$f1,
   evaluation_27_kknn$f1,
   evaluation_29_kknn$f1,
   evaluation_38_kknn$f1,
@@ -555,7 +554,9 @@ f1_combined_kknn<-as.data.frame(
   evaluation_55_kknn$f1,
   evaluation_56_kknn$f1,
   evaluation_6332_kknn$f1,
-  evaluation_944_kknn$f1
+  evaluation_944_kknn$f1,
+  evaluation_1018_kknn$f1,
+  evaluation_23381_kknn$f1
 ))
 rownames(f1_combined_kknn) <- NULL
 colnames(f1_combined_kknn)<-c('insert_mean','mice_pmm','vim_knn','vim_hotdeck','softImpute')
@@ -602,6 +603,16 @@ heatmap(as.matrix(ranking_combined))
 
 ```
 
+## Conclusions
+
+```{r}
+f1_point_data <- melt(f1_combined_rpart)
+
+ggplot(f1_point_data, aes(x = data_name, y = value, color = variable)) +
+  geom_jitter(width=0.15) +
+  theme(axis.text.x = element_text(angle = 45))+
+  scale_x_discrete(expand=c(0.1, 0.2))
+```
 
 ## References 
 

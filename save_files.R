@@ -98,7 +98,7 @@ save_to_file <- function(data, target, data_name) {
   write.csv2(data_test_softImpute,paste0("./files/",data_name,"/test_softImpute.csv"), row.names = FALSE)
 }
 
-# save_to_file(dataset1018,target1018,"dataset1018") dziwny error
+save_to_file(dataset1018,target1018,"dataset1018")
 save_to_file(dataset1590,target1590,"dataset1590") # done
 save_to_file(dataset188,target188,"dataset188") # done
 save_to_file(dataset23381,target23381,"dataset23381") # done
