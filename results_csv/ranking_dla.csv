@@ -1,6 +1,6 @@
-"imputation";"adult";"eucalyptus";"colic";"credit-approval";"sick";"labor";"SpeedDating";"hepatitis";"vote";"cylinder-bands";"echoMonths";"mean"
-"insert_mean";1;2;2;3;3;3;2;2;1;2;1;2
-"mice_pmm";2;3;1;5;4;5;3;2;1;5;5;3,27272727272727
-"vim_knn";4;1;4;3;5;1;2;1;1;3;1;2,36363636363636
-"vim_hotdeck";3;1;4;2;1;3;1;1;1;1;1;1,72727272727273
-"softImpute";1;4;3;1;2;2;2;2;1;1;1;1,81818181818182
+"imputation";"ipums_la_99-small";"adult";"eucalyptus";"dresses-sales";"colic";"credit-approval";"sick";"labor";"SpeedDating";"stem-okcupid";"hepatitis";"vote";"cylinder-bands";"echoMonths";"mean"
+"insert_mean";2;1;2;5;2;3;3;3;2;5;2;1;2;1;2,42857142857143
+"mice_pmm";4;2;3;5;1;5;4;5;3;5;2;1;5;5;3,57142857142857
+"vim_knn";3;4;1;5;4;3;5;1;2;5;1;1;3;1;2,78571428571429
+"vim_hotdeck";1;3;1;5;4;2;1;3;1;5;1;1;1;1;2,14285714285714
+"softImpute";2;1;4;5;3;1;2;2;2;5;2;1;1;1;2,28571428571429

@@ -9,6 +9,8 @@ dplyr
 stringr
 forcats
 reshape2
+xgboost
+kknn
 mice
 DescTools
 ParamHelpers
@@ -25,5 +27,3 @@ softImpute
 OpenML
 imputeMissings
 jsonlite
-xgboost
-kknn

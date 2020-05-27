@@ -487,8 +487,10 @@ evaluation_41278_kknn <- imputations_performance(target41278, "dataset41278", "c
 # 1590, 188, 27, 29, 38, 4, 40536, 55, 56, 6332, 944
 f1_combined_kknn<-as.data.frame(
   rbind(
+  evaluation_1018_kknn,
   evaluation_1590_kknn,
   evaluation_188_kknn,
+  evaluation_23381_kknn,
   evaluation_27_kknn,
   evaluation_29_kknn,
   evaluation_38_kknn,
@@ -498,9 +500,7 @@ f1_combined_kknn<-as.data.frame(
   evaluation_55_kknn,
   evaluation_56_kknn,
   evaluation_6332_kknn,
-  evaluation_944_kknn,
-  evaluation_1018_kknn,
-  evaluation_23381_kknn
+  evaluation_944_kknn
 ))
 rownames(f1_combined_kknn) <- NULL
 colnames(f1_combined_kknn)<-c('insert_mean','mice_pmm','vim_knn','vim_hotdeck','softImpute')
