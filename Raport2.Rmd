@@ -40,11 +40,11 @@ In the following table are presented the datasets used for this experiment, alon
 
 ```{r dataset table, results='hide'}
 library(dplyr)
-data_nr <- c("1590", "188", "27", "29", "38", "4", "40536", "55", "56", "6332", "944", "1018", "23381")
-data_name <- c("adult", "eucalyptus", "colic", "credit-approval", "sick", "labor", "SpeedDating", "hepatitis", "vote", "cylinder-bands", "echoMonths", "ipums_la_99-small", "dresses-sales")
-nr_instances <- c(48842, 736, 368, 690, 3772, 57, 8378, 155, 435, 540, 130, 8844, 500)
-nr_features <- c(13, 16, 20, 16, 28, 17, 123, 20, 17, 34, 10, 57, 13)
-nr_missing<-c(6465, 455, 1199, 67, 2293, 326, 18570, 167, 392, 999, 97, 34843, 835)
+data_nr <- c("1018","1590", "188", "23381", "27", "29", "38", "4", "40536", "41278", "55", "56", "6332", "944")
+data_name <- c("ipums_la_99-small", "adult", "eucalyptus", "dresses-sales", "colic", "credit-approval", "sick", "labor", "SpeedDating", "stem-okcupid", "hepatitis", "vote", "cylinder-bands", "echoMonths" )
+nr_instances <- c(8844, 48842, 736, 500, 368, 690, 3772, 57, 8378, 45907, 155, 435, 540, 130)
+nr_features <- c(56, 13, 16,  13, 20, 16, 28, 17, 123, 20, 20, 17, 34, 10)
+nr_missing<-c(34843, 6465, 455, 955, 1199, 67, 2293, 326, 18570,139693, 167, 392, 999, 97)
 
 datasets <- data.frame(cbind(data_nr, 
                      data_name, 
@@ -133,10 +133,6 @@ The overall measure of the imputation performance is a mean of it's ranks from a
 ### Results Rpart
 
 ```{r small data, results='hide'}
-# numery wszystkich zbiorów: 1018, 1590, 188, 23381, 27, 29, 38, 4, 40536, 41278, 55, 56, 6332, 944
-
-# numery używanych obecnie: 1590, 188, 27, 29, 38, 4, 40536, 55, 56, 6332, 944
-
 evaluation_944_rpart <- imputations_performance(target944, "dataset944", "classif.rpart")
 evaluation_56_rpart <- imputations_performance(target56, "dataset56", "classif.rpart") 
 evaluation_55_rpart <- imputations_performance(target55,  "dataset55", "classif.rpart")
@@ -147,50 +143,31 @@ evaluation_29_rpart <- imputations_performance(target29, "dataset29", "classif.r
 evaluation_4_rpart <- imputations_performance(target4,  "dataset4", "classif.rpart")
 evaluation_1018_rpart <- imputations_performance(target1018, "dataset1018", "classif.rpart")
 evaluation_23381_rpart <- imputations_performance(target23381, "dataset23381", "classif.rpart")
-```
-
-```{r big data 1, results='hide'}
-# na potrzeby duzych zbiorów w mice jest 1x1 , pmm i dodatkowy parametr zeby te weights sie nie wywalało 
-# wykomentowane bo długo sie mielą i wywalaja sesje R czasami xd
-
-# evaluation_41278_rpart <- imputations_performance(target41278,"dataset41278", "classif.rpart") 
-```
-
-```{r big data 2, results='hide'}
 evaluation_40536_rpart <- imputations_performance(target40536,  "dataset40536", "classif.rpart")
+evaluation_6332_rpart <- imputations_performance(target6332, "dataset6332", "classif.rpart")
+evaluation_1590_rpart <- imputations_performance(target1590, "dataset1590", "classif.rpart")
+evaluation_41278_rpart <- imputations_performance(target41278,"dataset41278", "classif.rpart") 
 ```
 
-```{r big data 3, results='hide'}
-# evaluation_23381_rpart <- imputations_performance(target23381, "dataset23381", "classif.rpart")  
-```
-
-```{r big data 4, results='hide'}
-evaluation_6332_rpart <- imputations_performance(target6332, "dataset6332", "classif.rpart") 
-```
-
-```{r big data 5, results='hide'}
-evaluation_1590_rpart <- imputations_performance(target1590, "dataset1590", "classif.rpart") 
-```
 
 ```{r f1 rpart, results= 'markup'}
 # 1590, 188, 27, 29, 38, 4, 40536, 55, 56, 6332, 944
-f1_combined_rpart<-as.data.frame(
-  rbind(
-  evaluation_1590_rpart$f1,
-  evaluation_188_rpart$f1,
-  evaluation_27_rpart$f1,
-  evaluation_29_rpart$f1,
-  evaluation_38_rpart$f1,
-  evaluation_4_rpart$f1,
-  evaluation_40536_rpart$f1,
-  #evaluation_41278_rpart$f1,
-  evaluation_55_rpart$f1,
-  evaluation_56_rpart$f1,
-  evaluation_6332_rpart$f1,
-  evaluation_944_rpart$f1,
+f1_combined_rpart<-rbind(
   evaluation_1018_rpart,
-  evaluation_23381_rpart
-))
+  evaluation_1590_rpart,
+  evaluation_188_rpart,
+  evaluation_23381_rpart,
+  evaluation_27_rpart,
+  evaluation_29_rpart,
+  evaluation_38_rpart,
+  evaluation_4_rpart,
+  evaluation_40536_rpart,
+  evaluation_41278_rpart,
+  evaluation_55_rpart,
+  evaluation_56_rpart,
+  evaluation_6332_rpart,
+  evaluation_944_rpart
+)
 rownames(f1_combined_rpart) <- NULL
 colnames(f1_combined_rpart)<-c('insert_mean','mice_pmm','vim_knn','vim_hotdeck','softImpute')
 f1_combined_rpart<-cbind(data_name, f1_combined_rpart)
@@ -243,10 +220,11 @@ ranking<-function(f1_combined){
   ranks<-as.data.frame(lapply(df%>%select(-imputation), dense_rank))%>%
     mutate(imputation=df$imputation)
   ranks[is.na(ranks)]<-5
-  ranks<-ranks%>%select(14, 1:13)
+  n<-ncol(ranks)
+  ranks<-ranks%>%select(n, 1:n-1)
   colnames(ranks)<-c("imputation",data_name)
   
-  ranks<-cbind(ranks, mean=rowMeans(ranks[2:14]))
+  ranks<-cbind(ranks, mean=rowMeans(ranks[2:15]))
   
   return(ranks)
 }
@@ -268,6 +246,10 @@ ggplot(ranking_rpart_melt, aes(x = imputation, y = value)) +
   
 ```
 
+```{r write_ranking_rpart}
+write.csv2(ranking_rpart, "./results_csv/ranking_rpart.csv", row.names = FALSE)
+```
+
 ### Results Naive Bayes
 
 ```{r nb 1, results='hide'}
@@ -280,45 +262,33 @@ evaluation_27_nb <- imputations_performance(target27,  "dataset27", "classif.nai
 evaluation_188_nb <- imputations_performance(target188, "dataset188", "classif.naive_bayes") 
 evaluation_29_nb <- imputations_performance(target29, "dataset29", "classif.naive_bayes") 
 evaluation_4_nb <- imputations_performance(target4,  "dataset4", "classif.naive_bayes")
-evaluation_1018_nb <- imputations_performance(target1018,"dataset1018","classif.naive_bayes")
-evaluation_23381_nb <- imputations_performance(target23381,"dataset23381","classif.naive_bayes")
-```
-
-```{r nb 2, results='hide'}
+evaluation_1018_nb <-imputations_performance(target1018,"dataset1018","classif.naive_bayes")
+evaluation_23381_nb <-imputations_performance(target23381,"dataset23381","classif.naive_bayes")
 evaluation_40536_nb <- imputations_performance(target40536,  "dataset40536", "classif.naive_bayes")
-```
-
-```{r nb 3, results='hide'}
-# evaluation_23381_nb <- imputations_performance(target23381, "dataset23381", "classif.naive_bayes")  
-```
-
-```{r nb 4, results='hide'}
 evaluation_6332_nb <- imputations_performance(target6332, "dataset6332", "classif.naive_bayes") 
+evaluation_1590_nb <- imputations_performance(target1590, "dataset1590", "classif.naive_bayes") 
+evaluation_41278_nb <- imputations_performance(target41278, "dataset41278", "classif.naive_bayes") 
 ```
 
-```{r nb 5, results='hide'}
-evaluation_1590_nb <- imputations_performance(target1590, "dataset1590", "classif.naive_bayes") 
-```
+
 
 ```{r f1 nb, results= 'markup'}
-# 1590, 188, 27, 29, 38, 4, 40536, 55, 56, 6332, 944
 f1_combined_nb<-as.data.frame(
   rbind(
-  evaluation_1590_nb$f1,
-  evaluation_188_nb$f1,
-  #evaluation_23381_nb$f1,
-  evaluation_27_nb$f1,
-  evaluation_29_nb$f1,
-  evaluation_38_nb$f1,
-  evaluation_4_nb$f1,
-  evaluation_40536_nb$f1,
-  #evaluation_41278_nb$f1,
-  evaluation_55_nb$f1,
-  evaluation_56_nb$f1,
-  evaluation_6332_nb$f1,
-  evaluation_944_nb$f1,
-  evaluation_1018_nb$f1,
-  evaluation_23381_nb$f1
+  evaluation_1018_nb,
+  evaluation_1590_nb,
+  evaluation_188_nb,
+  evaluation_23381_nb,
+  evaluation_27_nb,
+  evaluation_29_nb,
+  evaluation_38_nb,
+  evaluation_4_nb,
+  evaluation_40536_nb,
+  evaluation_41278_nb,
+  evaluation_55_nb,
+  evaluation_56_nb,
+  evaluation_6332_nb,
+  evaluation_944_nb
 ))
 rownames(f1_combined_nb) <- NULL
 colnames(f1_combined_nb)<-c('insert_mean','mice_pmm','vim_knn','vim_hotdeck','softImpute')
@@ -347,6 +317,9 @@ ggplot(ranking_nb_melt, aes(x = imputation, y = value)) +
   
 ```
 
+```{r write_ranking_nb}
+write.csv2(ranking_nb, "./results_csv/ranking_nb.csv", row.names = FALSE)
+```
 
 ### Results Ranger 
 
@@ -362,42 +335,31 @@ evaluation_29_ranger <- imputations_performance(target29, "dataset29", "classif.
 evaluation_4_ranger <- imputations_performance(target4,  "dataset4", "classif.ranger")
 evaluation_1018_ranger <- imputations_performance(target1018,"dataset1018","classif.ranger")
 evaluation_23381_ranger <- imputations_performance(target23381,"dataset23381","classif.ranger")
-```
-
-```{r ranger 2, results='hide'}
-evaluation_40536_ranger <- imputations_performance(target40536,  "dataset40536", "classif.ranger")  
-```
-
-```{r ranger 3, results='hide'}
-# evaluation_23381_ranger <- imputations_performance(target23381, "dataset23381", "classif.ranger") 
-```
-
-```{r ranger 4, results='hide'}
+evaluation_40536_ranger <- imputations_performance(target40536,  "dataset40536", "classif.ranger")
 evaluation_6332_ranger <- imputations_performance(target6332, "dataset6332", "classif.ranger") 
+evaluation_1590_ranger <- imputations_performance(target1590, "dataset1590", "classif.ranger") 
+evaluation_41278_ranger <- imputations_performance(target41278, "dataset41278", "classif.ranger") 
 ```
 
-```{r ranger 5, results='hide'}
-evaluation_1590_ranger <- imputations_performance(target1590, "dataset1590", "classif.ranger")  
-```
+
 
 ```{r f1 ranger, results= 'markup'}
-# 1590, 188, 27, 29, 38, 4, 40536, 55, 56, 6332, 944
 f1_combined_ranger<-as.data.frame(
   rbind(
-  evaluation_1590_ranger$f1,
-  evaluation_188_ranger$f1,
-  evaluation_27_ranger$f1,
-  evaluation_29_ranger$f1,
-  evaluation_38_ranger$f1,
-  evaluation_4_ranger$f1,
-  evaluation_40536_ranger$f1,
-  #evaluation_41278_ranger$f1,
-  evaluation_55_ranger$f1,
-  evaluation_56_ranger$f1,
-  evaluation_6332_ranger$f1,
-  evaluation_944_ranger$f1,
-  evaluation_1018_ranger$f1,
-  evaluation_23381_ranger$f1
+  evaluation_1018_ranger,
+  evaluation_1590_ranger,
+  evaluation_188_ranger,
+  evaluation_23381_ranger,
+  evaluation_27_ranger,
+  evaluation_29_ranger,
+  evaluation_38_ranger,
+  evaluation_4_ranger,
+  evaluation_40536_ranger,
+  evaluation_41278_ranger,
+  evaluation_55_ranger,
+  evaluation_56_ranger,
+  evaluation_6332_ranger,
+  evaluation_944_ranger
 ))
 rownames(f1_combined_ranger) <- NULL
 colnames(f1_combined_ranger)<-c('insert_mean','mice_pmm','vim_knn','vim_hotdeck','softImpute')
@@ -426,7 +388,9 @@ ggplot(ranking_ranger_melt, aes(x = imputation, y = value)) +
   
 ```
 
-
+```{r write_ranking_ranger}
+write.csv2(ranking_ranger, "./results_csv/ranking_ranger.csv", row.names = FALSE)
+```
 
 ### Results LDA 
 
@@ -442,42 +406,30 @@ evaluation_29_lda <- imputations_performance(target29, "dataset29", "classif.lda
 evaluation_4_lda <- imputations_performance(target4,  "dataset4", "classif.lda")
 evaluation_1018_lda <- imputations_performance(target1018, "dataset1018", "classif.lda")
 evaluation_23381_lda <- imputations_performance(target23381, "dataset23381", "classif.lda")
-```
-
-```{r lda 2, results='hide'}
-evaluation_40536_lda <- imputations_performance(target40536,  "dataset40536", "classif.lda")  
-```
-
-```{r lda 3, results='hide'}
-# evaluation_23381_lda <- imputations_performance(target23381, "dataset23381", "classif.lda") 
-```
-
-```{r lda 4, results='hide'}
-evaluation_6332_lda <- imputations_performance(target6332, "dataset6332", "classif.lda") 
-```
-
-```{r lda 5, results='hide'}
+evaluation_40536_lda <- imputations_performance(target40536,  "dataset40536", "classif.lda")
+evaluation_6332_lda <- imputations_performance(target6332, "dataset6332", "classif.lda")
 evaluation_1590_lda <- imputations_performance(target1590, "dataset1590", "classif.lda") 
+evaluation_41278_lda <- imputations_performance(target41278, "dataset41278", "classif.lda") 
 ```
+
 
 ```{r f1 lda, results= 'markup'}
-# 1590, 188, 27, 29, 38, 4, 40536, 55, 56, 6332, 944
 f1_combined_lda<-as.data.frame(
   rbind(
-  evaluation_1590_lda$f1,
-  evaluation_188_lda$f1,
-  evaluation_27_lda$f1,
-  evaluation_29_lda$f1,
-  evaluation_38_lda$f1,
-  evaluation_4_lda$f1,
-  evaluation_40536_lda$f1,
-  #evaluation_41278_lda$f1,
-  evaluation_55_lda$f1,
-  evaluation_56_lda$f1,
-  evaluation_6332_lda$f1,
-  evaluation_944_lda$f1,
-  evaluation_1018_lda$f1,
-  evaluation_23381_lda
+  evaluation_1018_lda,
+  evaluation_1590_lda,
+  evaluation_188_lda,
+  evaluation_23381_lda,
+  evaluation_27_lda,
+  evaluation_29_lda,
+  evaluation_38_lda,
+  evaluation_4_lda,
+  evaluation_40536_lda,
+  evaluation_41278_lda,
+  evaluation_55_lda,
+  evaluation_56_lda,
+  evaluation_6332_lda,
+  evaluation_944_lda
 ))
 rownames(f1_combined_lda) <- NULL
 colnames(f1_combined_lda)<-c('insert_mean','mice_pmm','vim_knn','vim_hotdeck','softImpute')
@@ -506,6 +458,9 @@ ggplot(ranking_lda_melt, aes(x = imputation, y = value)) +
   
 ```
 
+```{r write_ranking_lda}
+write.csv2(ranking_lda, "./results_csv/ranking_dla.csv", row.names = FALSE)
+```
 
 ### Results KNN 
 
@@ -521,42 +476,31 @@ evaluation_29_kknn <- imputations_performance(target29, "dataset29", "classif.kk
 evaluation_4_kknn <- imputations_performance(target4,  "dataset4", "classif.kknn")  
 evaluation_1018_kknn <- imputations_performance(target1018, "dataset1018", "classif.kknn")
 evaluation_23381_kknn <- imputations_performance(target23381, "dataset23381", "classif.kknn")
-```
-
-```{r kknn 2, results='hide'}
-evaluation_40536_kknn <- imputations_performance(target40536,  "dataset40536", "classif.kknn")  
-```
-
-```{r kknn 3, results='hide'}
-#evaluation_23381_kknn <- imputations_performance(target23381, "dataset23381", "classif.kknn")
-```
-
-```{r kknn 4, results='hide'}
+evaluation_40536_kknn <- imputations_performance(target40536,  "dataset40536", "classif.kknn") 
 evaluation_6332_kknn <- imputations_performance(target6332, "dataset6332", "classif.kknn") 
+evaluation_1590_kknn <- imputations_performance(target1590, "dataset1590", "classif.kknn")
+evaluation_41278_kknn <- imputations_performance(target41278, "dataset41278", "classif.kknn") 
 ```
 
-```{r kknn 5, results='hide'}
-evaluation_1590_kknn <- imputations_performance(target1590, "dataset1590", "classif.kknn") 
-```
 
 ```{r f1 kknn, results= 'markup'}
 # 1590, 188, 27, 29, 38, 4, 40536, 55, 56, 6332, 944
 f1_combined_kknn<-as.data.frame(
   rbind(
-  evaluation_1590_kknn$f1,
-  evaluation_188_kknn$f1,
-  evaluation_27_kknn$f1,
-  evaluation_29_kknn$f1,
-  evaluation_38_kknn$f1,
-  evaluation_4_kknn$f1,
-  evaluation_40536_kknn$f1,
-  #evaluation_41278_kknn$f1,
-  evaluation_55_kknn$f1,
-  evaluation_56_kknn$f1,
-  evaluation_6332_kknn$f1,
-  evaluation_944_kknn$f1,
-  evaluation_1018_kknn$f1,
-  evaluation_23381_kknn$f1
+  evaluation_1590_kknn,
+  evaluation_188_kknn,
+  evaluation_27_kknn,
+  evaluation_29_kknn,
+  evaluation_38_kknn,
+  evaluation_4_kknn,
+  evaluation_40536_kknn,
+  evaluation_41278_kknn,
+  evaluation_55_kknn,
+  evaluation_56_kknn,
+  evaluation_6332_kknn,
+  evaluation_944_kknn,
+  evaluation_1018_kknn,
+  evaluation_23381_kknn
 ))
 rownames(f1_combined_kknn) <- NULL
 colnames(f1_combined_kknn)<-c('insert_mean','mice_pmm','vim_knn','vim_hotdeck','softImpute')
@@ -585,6 +529,9 @@ ggplot(ranking_kknn_melt, aes(x = imputation, y = value)) +
   
 ```
 
+```{r write_ranking_kknn}
+write.csv2(ranking_kknn, "./results_csv/ranking_kknn.csv", row.names = FALSE)
+```
 ## Rating summary
 
 ```{r rating summary}

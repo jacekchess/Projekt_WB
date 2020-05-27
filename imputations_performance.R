@@ -13,23 +13,18 @@ library(imputeMissings)
 
 imputations_performance <- function(target, data_name, model_name) {
   # przyjmuje target, nazwę zbioru (string) oraz rodzaj modelu do wytrenowania na wszystkich imputacjach tego zbioru
-  if((data_name == "dataset1018" && model_name == "classif.rpart") ||
-     (data_name == "dataset23381" && (model_name == "classif.rpart" || model_name == "classif.lda"))) {
-    return(rep(NA, 5))
-  }
+  # if((data_name == "dataset1018" && model_name == "classif.rpart") ||
+  #    (data_name == "dataset23381" && (model_name == "classif.rpart" || model_name == "classif.lda"))) {
+  #   
+  #   perf_combined <- transpose(as.data.frame(rep(NA, 5)))
+  #   rownames(perf_combined)<-"f1"
+  #   colnames(perf_combined)<-c('perf_insert_mean','perf_mice','perf_vim_knn','perf_vim_hotdeck','perf_softImpute')
+  #   return(perf_combined)
   
   model <- function(data_test, data_train, model_name) {
     # takes test and train dataset and performs rpart modelling
-    # returns auc and  balanced acc measures
-    
-    # MLR
-    # task <- makeClassifTask(data = data_train, target = target)
-    # learner <- makeLearner(model_name, predict.type = "prob")
-    # model <- train(learner, task)
-    # 
-    # prediction <- predict(model, newdata = data_test)
-    # performance <- performance(prediction, measure = list(auc,acc))
-    
+    # returns f1 measures
+
     # MLR3
     
     task <- TaskClassif$new(id="task", backend = data_train, target = target)
@@ -72,9 +67,15 @@ imputations_performance <- function(target, data_name, model_name) {
   test_softImpute[,target]<-as.factor(test_softImpute[, target])
   train_softImpute[,target]<-as.factor(train_softImpute[, target])
   
-  perf_insert_mean <- model(test_mean, train_mean, model_name)
-  
-  # Jesli mice nie zadziala to daje NA
+  perf_insert_mean <- tryCatch(
+    {
+      model(test_mean, train_mean, model_name)
+    },
+    error=function(cond) {
+      return(NA)
+    }
+  )
+    
   perf_mice <- tryCatch(
     {
       model(test_mice, train_mice, model_name)
@@ -83,17 +84,39 @@ imputations_performance <- function(target, data_name, model_name) {
       return(NA)
     }
   )
-  perf_vim_knn <- model(test_vim_knn,train_vim_knn, model_name)
-  perf_vim_hotdeck <- model(test_vim_hotdeck, train_vim_hotdeck, model_name)
-  perf_softImpute <- model(test_softImpute,train_softImpute, model_name)
+  perf_vim_knn <- tryCatch(
+    {
+      model(test_vim_knn,train_vim_knn, model_name)
+    },
+    error=function(cond) {
+      return(NA)
+    }
+  )
+  perf_vim_hotdeck <- tryCatch(
+    {
+      model(test_vim_hotdeck, train_vim_hotdeck, model_name)
+    },
+    error=function(cond) {
+      return(NA)
+    }
+  )
+  perf_softImpute <- tryCatch(
+    {
+      model(test_softImpute,train_softImpute, model_name)
+    },
+    error=function(cond) {
+      return(NA)
+    }
+  )
 
    
-  perf_combined <- as.data.frame(rbind( 
+  perf_combined <- as.data.frame(cbind( 
      perf_insert_mean, 
      perf_mice, 
      perf_vim_knn, 
      perf_vim_hotdeck,
      perf_softImpute))
-   colnames(perf_combined)<-"f1"
+   rownames(perf_combined)<-"f1"
+   
   return(perf_combined)
 }
