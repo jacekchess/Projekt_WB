@@ -47,25 +47,24 @@ save_to_file <- function(data, target, data_name) {
   # Imputacja funkcją mice
   data_train_mice <- data_train
   data_test_mice <- data_test
-  # if (dim(dataset)[1]==8844 & dim(dataset)[2]==56){
-  #   print("1018")
-  #   imp1 <- mice(data_train_mice, m = 1, maxit = 1, nnet.MaxNWts=3000)
-  #   data_train_mice <- mice::complete(imp1)
-  #   imp2 <- mice(data_test_mice, m = 1, maxit = 1, nnet.MaxNWts=3000)
-  #   data_test_mice <- mice::complete(imp2)
-  #   print("mice")
-  # }
-  # else{
-  imp1 <- mice(data_train_mice, method = "pmm", m = 1, maxit = 1, nnet.MaxNWts=3000)
-  data_train_mice <- mice::complete(imp1)
-  # data_train_mice <- imputeMissings::impute(data_train_mice)
-  imp2 <- mice(data_test_mice, method = "pmm", m = 1, maxit = 1, nnet.MaxNWts=3000)
-  data_test_mice <- mice::complete(imp2)
-  # data_test_mice <- imputeMissings::impute(data_test_mice)
-  print("mice")
+  if (data_name == "dataset1018"){
+    print("1018")
+    imp1 <- mice(data_train_mice, m = 1, maxit = 1, nnet.MaxNWts=3000)
+    data_train_mice <- mice::complete(imp1)
+    imp2 <- mice(data_test_mice, m = 1, maxit = 1, nnet.MaxNWts=3000)
+    data_test_mice <- mice::complete(imp2)
+    print("mice")
+  }
+  else{
+    imp1 <- mice(data_train_mice, method = "pmm", m = 1, maxit = 1, nnet.MaxNWts=3000)
+    data_train_mice <- mice::complete(imp1)
+    imp2 <- mice(data_test_mice, method = "pmm", m = 1, maxit = 1, nnet.MaxNWts=3000)
+    data_test_mice <- mice::complete(imp2)
+    print("mice")
+  }
   write.csv2(data_train_mice,paste0("./files/",data_name,"/train_mice.csv"), row.names = FALSE)
   write.csv2(data_test_mice,paste0("./files/",data_name,"/test_mice.csv"), row.names = FALSE)
-  # }
+  
   
   # imputacja z VIM
   

@@ -59,7 +59,6 @@ datasets1<-datasets%>%
             nr_features=as.numeric(as.character(nr_features)),
             nr_missing=as.numeric(as.character(nr_missing)))%>%
   mutate(procent_missing=round(nr_missing/(nr_instances*nr_features),2))
-# colnames(datasets)
 
 ```
 
@@ -136,44 +135,25 @@ The overall measure of the imputation performance is a mean of it's ranks from a
 ```{r small data, results='hide'}
 # numery wszystkich zbiorów: 1018, 1590, 188, 23381, 27, 29, 38, 4, 40536, 41278, 55, 56, 6332, 944
 
-# numery używanych obecnie: 1590, 188, 23381, 27, 29, 38, 4, 40536, 55, 56, 6332, 944
-
-###################### GIT ZBIORKI: 944, 56, 55, 38, 27, 188, 29, 4
+# numery używanych obecnie: 1590, 188, 27, 29, 38, 4, 40536, 55, 56, 6332, 944
 
 evaluation_944_rpart <- imputations_performance(target944, "dataset944", "classif.rpart")
 evaluation_56_rpart <- imputations_performance(target56, "dataset56", "classif.rpart") 
 evaluation_55_rpart <- imputations_performance(target55,  "dataset55", "classif.rpart")
-evaluation_38_rpart <- imputations_performance(target38,  "dataset38", "classif.rpart") # długi missForest 
+evaluation_38_rpart <- imputations_performance(target38,  "dataset38", "classif.rpart") 
 evaluation_27_rpart <- imputations_performance(target27,  "dataset27", "classif.rpart")
 evaluation_188_rpart <- imputations_performance(target188, "dataset188", "classif.rpart") 
 evaluation_29_rpart <- imputations_performance(target29, "dataset29", "classif.rpart") 
-# działa przy ustawieniu pmm w mice, inaczej nie
 evaluation_4_rpart <- imputations_performance(target4,  "dataset4", "classif.rpart") 
-# evaluation_4_rpart <- rep(NA, 5)
-# przy rm rows zeruje sie zbiór testowy, treningowy ma jeden wiersz
 
-############################### PROBLEMY: 1018
-# evaluation_1018 <- imputations_performance(dataset1018,target1018)
-# przy rm rows zeruje sie zbiór testowy
-# przy mice nie działa dla "pmm"
-
-
+#evaluation_1018 <- imputations_performance(target1018, "dataset1018", "classif.rpart")
 ```
 
 ```{r big data 1, results='hide'}
-
-############################### DUŻE ZBIORKI: 41278, 6332, 40536, 1590, 23381
-
 # na potrzeby duzych zbiorów w mice jest 1x1 , pmm i dodatkowy parametr zeby te weights sie nie wywalało 
 # wykomentowane bo długo sie mielą i wywalaja sesje R czasami xd
-# testowałam funkcję ręcznie na data_test dla kazdego zbioru bo dla nich jeszcze w miare sie robiło
-# wiec mysle ze na train tez powinno działać xd
 
-
-
-# ten zbiór jest zjebany bo mega duży, wywalił mi sesje 3 razy wiec moze go olejmy 
 # evaluation_41278 <- imputations_performance(target41278,"dataset41278", "classif.rpart") 
-
 ```
 
 ```{r big data 2, results='hide'}
@@ -181,14 +161,11 @@ evaluation_40536_rpart <- imputations_performance(target40536,  "dataset40536", 
 ```
 
 ```{r big data 3, results='hide'}
-# evaluation_23381 <- imputations_performance(target23381, "dataset23381", "classif.rpart") # nie działa :( 
+# evaluation_23381 <- imputations_performance(target23381, "dataset23381", "classif.rpart")  
 ```
 
 ```{r big data 4, results='hide'}
-### do sprawdzenia, długo sie robi ale moze pojdzie 
 evaluation_6332_rpart <- imputations_performance(target6332, "dataset6332", "classif.rpart") 
-# jak pojdzie to odkomentowac w miarach !!!
-# błąd - missing data in columns
 ```
 
 ```{r big data 5, results='hide'}
@@ -196,17 +173,17 @@ evaluation_1590_rpart <- imputations_performance(target1590, "dataset1590", "cla
 ```
 
 ```{r f1 rpart, results= 'markup'}
-# 1590, 188, 23381, 27, 29, 38, 4, 40536, 55, 56, 6332, 944
+# 1590, 188, 27, 29, 38, 4, 40536, 55, 56, 6332, 944
 f1_combined_rpart<-as.data.frame(
   rbind(
+  #evaluation_1018$f1,
   evaluation_1590_rpart$f1,
   evaluation_188_rpart$f1,
-  #evaluation_23381$auc,
+  #evaluation_23381_rpart$f1,
   evaluation_27_rpart$f1,
   evaluation_29_rpart$f1,
   evaluation_38_rpart$f1,
   evaluation_4_rpart$f1,
-  # evaluation_4_rpart,
   evaluation_40536_rpart$f1,
   #evaluation_41278_rpart$f1,
   evaluation_55_rpart$f1,
@@ -218,6 +195,10 @@ rownames(f1_combined_rpart) <- NULL
 colnames(f1_combined_rpart)<-c('insert_mean','mice_pmm','vim_knn','vim_hotdeck','softImpute')
 f1_combined_rpart<-cbind(data_name, f1_combined_rpart)
 
+```
+
+```{r write_rpart}
+write.csv2(f1_combined_rpart, "./results_csv/rpart.csv", row.names = FALSE)
 ```
 
 ```{r tab2, resuls='hide'}
@@ -290,11 +271,6 @@ ggplot(ranking_rpart_melt, aes(x = imputation, y = value)) +
 ### Results Naive Bayes
 
 ```{r nb 1, results='hide'}
-# numery wszystkich zbiorów: 1018, 1590, 188, 23381, 27, 29, 38, 4, 40536, 41278, 55, 56, 6332, 944
-
-# numery używanych obecnie: 1590, 188, 23381, 27, 29, 38, 4, 40536, 55, 56, 6332, 944
-
-###################### GIT ZBIORKI: 944, 56, 55, 38, 27, 188, 29, 4
 
 evaluation_944_nb <- imputations_performance(target944, "dataset944", "classif.naive_bayes")
 evaluation_56_nb <- imputations_performance(target56, "dataset56", "classif.naive_bayes") 
@@ -303,17 +279,9 @@ evaluation_38_nb <- imputations_performance(target38,  "dataset38", "classif.nai
 evaluation_27_nb <- imputations_performance(target27,  "dataset27", "classif.naive_bayes")
 evaluation_188_nb <- imputations_performance(target188, "dataset188", "classif.naive_bayes") 
 evaluation_29_nb <- imputations_performance(target29, "dataset29", "classif.naive_bayes") 
-# działa przy ustawieniu pmm w mice, inaczej nie
-evaluation_4_nb <- imputations_performance(target4,  "dataset4", "classif.naive_bayes") # BŁĄD
-# evaluation_4_nb <- rep(NA, 5)
-# przy rm rows zeruje sie zbiór testowy, treningowy ma jeden wiersz
+evaluation_4_nb <- imputations_performance(target4,  "dataset4", "classif.naive_bayes")
 
-############################### PROBLEMY: 1018
-# evaluation_1018 <- imputations_performance(dataset1018,target1018)
-# przy rm rows zeruje sie zbiór testowy
-# przy mice nie działa dla "pmm"
-
-
+# evaluation_1018_nb <- imputations_performance(target1018,"dataset1018","classif.naive_bayes")
 ```
 
 ```{r nb 2, results='hide'}
@@ -321,14 +289,11 @@ evaluation_40536_nb <- imputations_performance(target40536,  "dataset40536", "cl
 ```
 
 ```{r nb 3, results='hide'}
-# evaluation_23381 <- imputations_performance(target23381, "dataset23381", "classif.naive_bayes") # nie działa :( 
+# evaluation_23381_nb <- imputations_performance(target23381, "dataset23381", "classif.naive_bayes")  
 ```
 
 ```{r nb 4, results='hide'}
-### do sprawdzenia, długo sie robi ale moze pojdzie 
 evaluation_6332_nb <- imputations_performance(target6332, "dataset6332", "classif.naive_bayes") 
-# jak pojdzie to odkomentowac w miarach !!!
-# błąd - missing data in columns
 ```
 
 ```{r nb 5, results='hide'}
@@ -336,17 +301,17 @@ evaluation_1590_nb <- imputations_performance(target1590, "dataset1590", "classi
 ```
 
 ```{r f1 nb, results= 'markup'}
-# 1590, 188, 23381, 27, 29, 38, 4, 40536, 55, 56, 6332, 944
+# 1590, 188, 27, 29, 38, 4, 40536, 55, 56, 6332, 944
 f1_combined_nb<-as.data.frame(
   rbind(
+  #evaluation_1018_nb$f1
   evaluation_1590_nb$f1,
   evaluation_188_nb$f1,
-  #evaluation_23381$auc,
+  #evaluation_23381_nb$f1,
   evaluation_27_nb$f1,
   evaluation_29_nb$f1,
   evaluation_38_nb$f1,
   evaluation_4_nb$f1,
-  # evaluation_4_nb,
   evaluation_40536_nb$f1,
   #evaluation_41278_nb$f1,
   evaluation_55_nb$f1,
@@ -358,6 +323,10 @@ rownames(f1_combined_nb) <- NULL
 colnames(f1_combined_nb)<-c('insert_mean','mice_pmm','vim_knn','vim_hotdeck','softImpute')
 f1_combined_nb<-cbind(data_name, f1_combined_nb)
 
+```
+
+```{r write_nb}
+write.csv2(f1_combined_nb, "./results_csv/nb.csv", row.names = FALSE)
 ```
 
 ```{r tab3, resuls='hide'}
@@ -390,12 +359,8 @@ evaluation_27_ranger <- imputations_performance(target27,  "dataset27", "classif
 evaluation_188_ranger <- imputations_performance(target188, "dataset188", "classif.ranger") 
 evaluation_29_ranger <- imputations_performance(target29, "dataset29", "classif.ranger")
 evaluation_4_ranger <- imputations_performance(target4,  "dataset4", "classif.ranger")
-# evaluation_4_ranger <- rep(NA, 5)
-##### RZUCA DZIWNY BŁĄD
 
-############################### PROBLEMY: 1018
-# evaluation_1018 <- imputations_performance(dataset1018,target1018)
-
+#evaluation_1018_ranger <- imputations_performance(target1018,"dataset1018","classif.ranger")
 ```
 
 ```{r ranger 2, results='hide'}
@@ -403,14 +368,11 @@ evaluation_40536_ranger <- imputations_performance(target40536,  "dataset40536",
 ```
 
 ```{r ranger 3, results='hide'}
-# evaluation_23381 <- imputations_performance(target23381, "dataset23381", "classif.ranger") # nie działa :( 
+# evaluation_23381 <- imputations_performance(target23381, "dataset23381", "classif.ranger") 
 ```
 
 ```{r ranger 4, results='hide'}
-### do sprawdzenia, długo sie robi ale moze pojdzie 
 evaluation_6332_ranger <- imputations_performance(target6332, "dataset6332", "classif.ranger") 
-# jak pojdzie to odkomentowac w miarach !!!
-# błąd - missing data in columns
 ```
 
 ```{r ranger 5, results='hide'}
@@ -418,12 +380,13 @@ evaluation_1590_ranger <- imputations_performance(target1590, "dataset1590", "cl
 ```
 
 ```{r f1 ranger, results= 'markup'}
-# 1590, 188, 23381, 27, 29, 38, 4, 40536, 55, 56, 6332, 944
+# 1590, 188, 27, 29, 38, 4, 40536, 55, 56, 6332, 944
 f1_combined_ranger<-as.data.frame(
   rbind(
+  #evaluation_1018_ranger$f1,
   evaluation_1590_ranger$f1,
   evaluation_188_ranger$f1,
-  #evaluation_23381$auc,
+  #evaluation_23381_ranger$f1,
   evaluation_27_ranger$f1,
   evaluation_29_ranger$f1,
   evaluation_38_ranger$f1,
@@ -440,6 +403,10 @@ rownames(f1_combined_ranger) <- NULL
 colnames(f1_combined_ranger)<-c('insert_mean','mice_pmm','vim_knn','vim_hotdeck','softImpute')
 f1_combined_ranger<-cbind(data_name, f1_combined_ranger)
 
+```
+
+```{r write_ranger}
+write.csv2(f1_combined_ranger, "./results_csv/ranger.csv", row.names = FALSE)
 ```
 
 ```{r tab4, resuls='hide'}
@@ -465,7 +432,6 @@ ggplot(ranking_ranger_melt, aes(x = imputation, y = value)) +
 
 ```{r lda 1, results='hide'}
 
-# variables are collinear
 evaluation_944_lda <- imputations_performance(target944, "dataset944", "classif.lda")   
 evaluation_56_lda <- imputations_performance(target56, "dataset56", "classif.lda") 
 evaluation_55_lda <- imputations_performance(target55,  "dataset55", "classif.lda")  
@@ -473,14 +439,9 @@ evaluation_38_lda <- imputations_performance(target38,  "dataset38", "classif.ld
 evaluation_27_lda <- imputations_performance(target27,  "dataset27", "classif.lda") 
 evaluation_188_lda <- imputations_performance(target188, "dataset188", "classif.lda")
 evaluation_29_lda <- imputations_performance(target29, "dataset29", "classif.lda") 
-evaluation_4_lda <- imputations_performance(target4,  "dataset4", "classif.lda") # TEN SAM BŁĄD CO WYŻEJ 
-# evaluation_4_lda <- rep(NA, 5)
-############################### PROBLEMY: 1018
-# evaluation_1018 <- imputations_performance(dataset1018,target1018)
-# przy rm rows zeruje sie zbiór testowy
-# przy mice nie działa dla "pmm"
+evaluation_4_lda <- imputations_performance(target4,  "dataset4", "classif.lda")
 
-
+# evaluation_1018_lda <- imputations_performance(target1018, "dataset1018", "classif.lda")
 ```
 
 ```{r lda 2, results='hide'}
@@ -488,27 +449,25 @@ evaluation_40536_lda <- imputations_performance(target40536,  "dataset40536", "c
 ```
 
 ```{r lda 3, results='hide'}
-# evaluation_23381 <- imputations_performance(target23381, "dataset23381", "classif.lda") # nie działa :( 
+# evaluation_23381 <- imputations_performance(target23381, "dataset23381", "classif.lda") 
 ```
 
 ```{r lda 4, results='hide'}
-### do sprawdzenia, długo sie robi ale moze pojdzie 
-evaluation_6332_lda <- imputations_performance(target6332, "dataset6332", "classif.lda") # bład przy modelu na mice
-# jak pojdzie to odkomentowac w miarach !!!
-# błąd - missing data in columns
+evaluation_6332_lda <- imputations_performance(target6332, "dataset6332", "classif.lda") 
 ```
 
 ```{r lda 5, results='hide'}
-evaluation_1590_lda <- imputations_performance(target1590, "dataset1590", "classif.lda") # robi sie 
+evaluation_1590_lda <- imputations_performance(target1590, "dataset1590", "classif.lda") 
 ```
 
 ```{r f1 lda, results= 'markup'}
-# 1590, 188, 23381, 27, 29, 38, 4, 40536, 55, 56, 6332, 944
+# 1590, 188, 27, 29, 38, 4, 40536, 55, 56, 6332, 944
 f1_combined_lda<-as.data.frame(
   rbind(
+  #evaluation_1018_lda$f1,
   evaluation_1590_lda$f1,
   evaluation_188_lda$f1,
-  #evaluation_23381$auc,
+  #evaluation_23381_lda$f1,
   evaluation_27_lda$f1,
   evaluation_29_lda$f1,
   evaluation_38_lda$f1,
@@ -525,6 +484,10 @@ rownames(f1_combined_lda) <- NULL
 colnames(f1_combined_lda)<-c('insert_mean','mice_pmm','vim_knn','vim_hotdeck','softImpute')
 f1_combined_lda<-cbind(data_name, f1_combined_lda)
 
+```
+
+```{r write_lda}
+write.csv2(f1_combined_lda, "./results_csv/lda.csv", row.names = FALSE)
 ```
 
 ```{r tab5, resuls='hide'}
@@ -556,48 +519,39 @@ evaluation_38_kknn <- imputations_performance(target38,  "dataset38", "classif.k
 evaluation_27_kknn <- imputations_performance(target27,  "dataset27", "classif.kknn")  
 evaluation_188_kknn <- imputations_performance(target188, "dataset188", "classif.kknn") 
 evaluation_29_kknn <- imputations_performance(target29, "dataset29", "classif.kknn")
-evaluation_4_kknn <- imputations_performance(target4,  "dataset4", "classif.kknn")  # BŁAD
-# evaluation_4_kknn <- rep(NA, 5)
+evaluation_4_kknn <- imputations_performance(target4,  "dataset4", "classif.kknn")  
 
-############################### PROBLEMY: 1018
-# evaluation_1018 <- imputations_performance(dataset1018,target1018)
-# przy rm rows zeruje sie zbiór testowy
-# przy mice nie działa dla "pmm"
-
-
+# evaluation_1018_kknn <- imputations_performance(target1018, "dataset1018", "classif.kknn")
 ```
 
 ```{r kknn 2, results='hide'}
-evaluation_40536_kknn <- imputations_performance(target40536,  "dataset40536", "classif.kknn") # robi sie 
+evaluation_40536_kknn <- imputations_performance(target40536,  "dataset40536", "classif.kknn")  
 ```
 
 ```{r kknn 3, results='hide'}
-# evaluation_23381 <- imputations_performance(target23381, "dataset23381", "classif.kknn") # nie działa :( 
+#evaluation_23381_kknn <- imputations_performance(target23381, "dataset23381", "classif.kknn")
 ```
 
 ```{r kknn 4, results='hide'}
-### do sprawdzenia, długo sie robi ale moze pojdzie 
-evaluation_6332_kknn <- imputations_performance(target6332, "dataset6332", "classif.kknn") # bład przy modelu na mice
-# jak pojdzie to odkomentowac w miarach !!!
-# błąd - missing data in columns
+evaluation_6332_kknn <- imputations_performance(target6332, "dataset6332", "classif.kknn") 
 ```
 
 ```{r kknn 5, results='hide'}
-evaluation_1590_kknn <- imputations_performance(target1590, "dataset1590", "classif.kknn") # robi sie 
+evaluation_1590_kknn <- imputations_performance(target1590, "dataset1590", "classif.kknn") 
 ```
 
 ```{r f1 kknn, results= 'markup'}
-# 1590, 188, 23381, 27, 29, 38, 4, 40536, 55, 56, 6332, 944
+# 1590, 188, 27, 29, 38, 4, 40536, 55, 56, 6332, 944
 f1_combined_kknn<-as.data.frame(
   rbind(
+  #evaluation_1018_kknn$f1,
   evaluation_1590_kknn$f1,
   evaluation_188_kknn$f1,
-  #evaluation_23381$auc,
+  #evaluation_23381_kknn$f1,
   evaluation_27_kknn$f1,
   evaluation_29_kknn$f1,
   evaluation_38_kknn$f1,
   evaluation_4_kknn$f1,
-  # evaluation_4_kknn,
   evaluation_40536_kknn$f1,
   #evaluation_41278_kknn$f1,
   evaluation_55_kknn$f1,
@@ -609,6 +563,10 @@ rownames(f1_combined_kknn) <- NULL
 colnames(f1_combined_kknn)<-c('insert_mean','mice_pmm','vim_knn','vim_hotdeck','softImpute')
 f1_combined_kknn<-cbind(data_name, f1_combined_kknn)
 
+```
+
+```{r write_kknn}
+write.csv2(f1_combined_kknn, "./results_csv/kknn.csv", row.names = FALSE)
 ```
 
 ```{r tab6, resuls='hide'}
