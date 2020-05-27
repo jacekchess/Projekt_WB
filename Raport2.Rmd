@@ -216,15 +216,16 @@ knitr::kable(f1_combined_rpart, caption = "Tab.2. Rpart results")
 ```{r ranking function}
 
 ranking<-function(f1_combined){
+  data_names<-as.character(f1_combined$data_name)
   df <- transpose(f1_combined[, -1], keep.names = "imputation")
   ranks<-as.data.frame(lapply(df%>%select(-imputation), dense_rank))%>%
     mutate(imputation=df$imputation)
   ranks[is.na(ranks)]<-5
   n<-ncol(ranks)
-  ranks<-ranks%>%select(n, 1:n-1)
-  colnames(ranks)<-c("imputation",data_name)
+  ranks<-ranks%>%select(n, 1:(n-1))
+  colnames(ranks)<-c("imputation",data_names)
   
-  ranks<-cbind(ranks, mean=rowMeans(ranks[2:15]))
+  ranks<-cbind(ranks, mean=rowMeans(ranks[2:n]))
   
   return(ranks)
 }
@@ -560,6 +561,47 @@ ggplot(f1_point_data, aes(x = data_name, y = value, color = variable)) +
   theme(axis.text.x = element_text(angle = 45))+
   scale_x_discrete(expand=c(0.1, 0.2))
 ```
+
+## Numer of missing values
+
+With imputation was the best on given dataset by number of missing
+
+```{r missing analisys}
+missing<-datasets1%>%select(data_nr,data_name, procent_missing)%>%
+  filter(data_nr %in% c(23381, 27,4,41278))
+
+ranking_mis<-function(f1_combined){
+  df <- transpose(f1_combined[, -1], keep.names = "imputation")
+  ranks<-as.data.frame(lapply(df%>%select(-imputation), dense_rank))%>%
+    mutate(imputation=df$imputation)
+  ranks[is.na(ranks)]<-5
+  n<-ncol(ranks)
+  ranks<-ranks%>%select(n, 1:n-1)
+  #colnames(ranks)<-c("imputation",data_name)
+  
+  ranks<-cbind(ranks, mean=rowMeans(ranks[2:15]))
+  
+  return(ranks)
+}
+ranking_rpart_mis<-ranking(f1_combined_rpart%>%filter(data_name %in% c('dresses-sales', 'colic', 'labor', 'stem-okcupid')))
+ranking_lda_mis<-ranking(f1_combined_lda%>%filter(data_name %in% c('dresses-sales', 'colic', 'labor', 'stem-okcupid')))
+ranking_ranger_mis<-ranking(f1_combined_ranger%>%filter(data_name %in% c('dresses-sales', 'colic', 'labor', 'stem-okcupid')))
+ranking_nb_mis<-ranking(f1_combined_nb%>%filter(data_name %in% c('dresses-sales', 'colic', 'labor', 'stem-okcupid')))
+ranking_kknn_mis<-ranking(f1_combined_kknn%>%filter(data_name %in% c('dresses-sales', 'colic', 'labor', 'stem-okcupid')))
+
+
+ranking_combined_mis<-as.data.frame(cbind(
+  rpart=ranking_rpart_mis$mean,
+  nb=ranking_nb_mis$mean,
+  ranger=ranking_ranger_mis$mean,
+  lda=ranking_lda_mis$mean,
+  kknn=ranking_kknn_mis$mean))
+row.names(ranking_combined_mis)<-c('insert_mean','mice_pmm','vim_knn','vim_hotdeck','softImpute')
+
+heatmap(as.matrix(ranking_combined_mis))
+```
+
+
 
 ## References 
 
