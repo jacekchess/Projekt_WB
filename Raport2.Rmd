@@ -146,14 +146,14 @@ evaluation_188_rpart <- imputations_performance(target188, "dataset188", "classi
 evaluation_29_rpart <- imputations_performance(target29, "dataset29", "classif.rpart") 
 evaluation_4_rpart <- imputations_performance(target4,  "dataset4", "classif.rpart") 
 
-#evaluation_1018 <- imputations_performance(target1018, "dataset1018", "classif.rpart")
+#evaluation_1018_rpart <- imputations_performance(target1018, "dataset1018", "classif.rpart")
 ```
 
 ```{r big data 1, results='hide'}
 # na potrzeby duzych zbiorów w mice jest 1x1 , pmm i dodatkowy parametr zeby te weights sie nie wywalało 
 # wykomentowane bo długo sie mielą i wywalaja sesje R czasami xd
 
-# evaluation_41278 <- imputations_performance(target41278,"dataset41278", "classif.rpart") 
+# evaluation_41278_rpart <- imputations_performance(target41278,"dataset41278", "classif.rpart") 
 ```
 
 ```{r big data 2, results='hide'}
@@ -161,7 +161,7 @@ evaluation_40536_rpart <- imputations_performance(target40536,  "dataset40536", 
 ```
 
 ```{r big data 3, results='hide'}
-# evaluation_23381 <- imputations_performance(target23381, "dataset23381", "classif.rpart")  
+# evaluation_23381_rpart <- imputations_performance(target23381, "dataset23381", "classif.rpart")  
 ```
 
 ```{r big data 4, results='hide'}
@@ -176,7 +176,7 @@ evaluation_1590_rpart <- imputations_performance(target1590, "dataset1590", "cla
 # 1590, 188, 27, 29, 38, 4, 40536, 55, 56, 6332, 944
 f1_combined_rpart<-as.data.frame(
   rbind(
-  #evaluation_1018$f1,
+  #evaluation_1018_rpart$f1,
   evaluation_1590_rpart$f1,
   evaluation_188_rpart$f1,
   #evaluation_23381_rpart$f1,
@@ -304,7 +304,7 @@ evaluation_1590_nb <- imputations_performance(target1590, "dataset1590", "classi
 # 1590, 188, 27, 29, 38, 4, 40536, 55, 56, 6332, 944
 f1_combined_nb<-as.data.frame(
   rbind(
-  #evaluation_1018_nb$f1
+  #evaluation_1018_nb$f1,
   evaluation_1590_nb$f1,
   evaluation_188_nb$f1,
   #evaluation_23381_nb$f1,
@@ -368,7 +368,7 @@ evaluation_40536_ranger <- imputations_performance(target40536,  "dataset40536",
 ```
 
 ```{r ranger 3, results='hide'}
-# evaluation_23381 <- imputations_performance(target23381, "dataset23381", "classif.ranger") 
+# evaluation_23381_ranger <- imputations_performance(target23381, "dataset23381", "classif.ranger") 
 ```
 
 ```{r ranger 4, results='hide'}
@@ -391,7 +391,6 @@ f1_combined_ranger<-as.data.frame(
   evaluation_29_ranger$f1,
   evaluation_38_ranger$f1,
   evaluation_4_ranger$f1,
-  # evaluation_4_ranger,
   evaluation_40536_ranger$f1,
   #evaluation_41278_ranger$f1,
   evaluation_55_ranger$f1,
@@ -449,7 +448,7 @@ evaluation_40536_lda <- imputations_performance(target40536,  "dataset40536", "c
 ```
 
 ```{r lda 3, results='hide'}
-# evaluation_23381 <- imputations_performance(target23381, "dataset23381", "classif.lda") 
+# evaluation_23381_lda <- imputations_performance(target23381, "dataset23381", "classif.lda") 
 ```
 
 ```{r lda 4, results='hide'}
@@ -472,7 +471,6 @@ f1_combined_lda<-as.data.frame(
   evaluation_29_lda$f1,
   evaluation_38_lda$f1,
   evaluation_4_lda$f1,
-  # evaluation_4_lda,
   evaluation_40536_lda$f1,
   #evaluation_41278_lda$f1,
   evaluation_55_lda$f1,
