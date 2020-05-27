@@ -25,3 +25,5 @@ softImpute
 OpenML
 imputeMissings
 jsonlite
+xgboost
+kknn
