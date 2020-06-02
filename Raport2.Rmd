@@ -559,9 +559,12 @@ ranking_combined<-as.data.frame(cbind(
   kknn=ranking_kknn$mean))
 row.names(ranking_combined)<-ranking_rpart$imputation
 
+ranking_melted <- melt(ranking_combined)
+ranking_melted <- cbind(ranking_melted, rep(ranking_rpart$imputation, 5))
+colnames(ranking_melted) <- c("algorithm", "score", "imputation")
 
-
-heatmap(as.matrix(ranking_combined))
+ggplot(ranking_melted, aes(x = algorithm, y = imputation, fill = score)) +
+  geom_tile()
 
 ```
 
