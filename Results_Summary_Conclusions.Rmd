@@ -1,0 +1,147 @@
+---
+title: "Results_Summary_Conclusions"
+author: "Martyna Majchrzak"
+date: "2 06 2020"
+output: html_document
+---
+
+# Results
+
+A missing value `NA` in the results table implicates, either that an imputation failed on this particular dataset, leaving missing values in it (when there are a few of them in a column), or that the model didn't manage to perform on the entire dataset, no matter what imputation (when there is a full row of missing values).
+
+## Results Rpart
+
+```{r}
+# tabelka wynik rpart
+```
+
+Rpart model failed on all imputations of 3 of the datasets. Within those 3 datasets all imputations will recieve rank '5', and therefore this will not affect their overall score within the Rpart model, but will affect Rpart as a whole compared to the other models.
+
+Most imputations received a F1 score within the range <0.6-0.99>. There are, however, two datasets that stand out - `SpeedDating` with score 1.0 (probably overfitting) and `labor` MICE pmm and softImpute are significantly lower.
+
+
+```{r}
+# boxplot wynik rpart
+```
+
+Generally, VIM knn and MICE pmm imputations gave the best results when combined with the Rpart model.
+
+## Results Naive Bayes
+
+
+```{r}
+# tabelka wynik 
+```
+Naive Bayes was able to perform classification on all imputations of all the datasets. It is the only model to have done that.
+The F1 measure values vary a lot more than in the Rpart model, from around 0.12 in the `ipums_la_99-small` dataset to 1.0 in two imputations of the `labor` dataset.
+
+
+```{r}
+# boxplot wynik
+```
+
+Generally, MICE pmm imputation gave the best results when combined with the Naive Bayes model.
+
+
+## Results Ranger
+
+```{r}
+# tabelka wynik 
+```
+
+The only missing values are for the MICE pmm imputation on 4 datasets, on which this imputation method failed, leaving missing values in the dataset. Those will all receive rank 5, decreasing the overall score of the MICE pmm imputation.
+The other F1 measure values are mostly between 0.6 and 0.99, with some outliers like the `ipums_la_99-small` dataset with values around 0.15.
+
+```{r}
+# boxplot wynik 
+```
+Generally, softImpute and VIM hotdeck imputations gave the best results when combined with the Ranger model.
+
+## Results LDA
+
+```{r}
+# tabelka wynik 
+```
+
+The LDA model failed to perform on 2 datasets. Besides that, there are 4 missing values in the second column, because this imputation method failed, leaving missing values in the dataset. Those will all receive rank 5, decreasing the overall score of the MICE pmm imputation.
+The F1 score values are mostly between 0.6 and 0.99, with some outliers like the `ipums_la_99-small` dataset with values around 0.28.
+
+```{r}
+#boxplot wynik 
+```
+
+Generally, VIM hotdeck imputation gave the best results when combined with the LDA model.
+
+## Results KKNN
+
+```{r}
+# tabelka wynik 
+```
+
+The KNN model managed to perform on all dataset, except for the MICE pmm imputations of 4 datasets, which failed, leaving missing values in the dataset. Those will all receive rank 5, decreasing the overall score of the MICE pmm imputation.
+The F1 score values are mostly between 0.65 and 0.99, with some outliers like the `ipums_la_99-small` dataset with values around 0.28 and `colic` dataset with values around 0.57.
+
+```{r}
+# boxplot wynik 
+```
+
+Generally, mean/mode imputation gave the best results when combined with the Weighted KNN model. VIM knn and softImpute were second best.
+
+
+## Comparing Models
+
+The heatmap below presents the mean from ranks of given imputation on all the datasets, combined with each classification model.
+
+```{r}
+# heatmapa wszystkie
+```
+
+It clearly shows, that there is no imputation that performs the best with every model. Every model has one or two imputations, that interact with it better than the others, but those are different for every classificator. 
+
+The efficiency of the model combined with a particular imputation depends on numerous factors. In the next chapter the impact of one possible factor - percent of missing values in the dataset before the imputation - will be discusses.
+
+## The impact of percent of missing values
+
+During the study, it was brought to the researchers' attention, that some of the unusual results appeared for the datasets, that originally had heigher that average percent of missing values.
+Therefore, an analogical chart was created, using only the following 4 datasets with the heighest percent of missing values.
+
+```{r}
+# Heatmapa 4
+```
+
+The results suggest, that Weighted KNN model generally performs better than other classification models on those datasets, no matter what imputation method it is combined with. Simmilar results are achieved for Ranger model combined with VIm hotdeck, softImpute and mean/mode imputations and Naive Bayes model combined with VIM knn, MICE pmm and mean/mode imputation.
+
+The appearence of such a dependence may suggest, that number of missing values in a dataset may be a contributing factor to the efficiency of an imputation method combined with a classification model.
+
+# Summary and conclusions
+
+The conclusions from this study can be devided for those, that apply to choosing the best imputation method if the model is imposed, and those which can help to choose a classification model in the first place.
+
+## Choosing an imputation for a model
+
+The choice of a best imputation technique for a particular classification model is not a simple task and it should be made taking a multitude of factors into consideration. From this study it seems that the best method for the following models are:
+
+- Rpart - VIM knn
+
+- Naive Bayes - MICE pmm
+
+- Ranger - VIM hotdeck and softImpute
+
+- LDA - VIM hotdeck
+
+- KKNN - mean/mode imputation
+
+This results may be affected by the specificity of the datasets and should not be treated as final recommendations.
+
+However, when reliability is needed, the only method we do not recommend is MICE pmm - it failed to impute 4 of the 14 datasets.
+
+## Choosing a model
+
+It is worth noting, that from all the models, only Rpart and Naive Bayes managed to perform on those datasets, that MiCE failed to impute, despite the fact, that they still had missing values. In addition, Naive Bayes was able to perform on every single one of the 14 datasets, which makes it the champion of this study, as far as the reliability of the model is concerned.
+
+When choosing a classification model for a dataset with with percentage of missing values, Weighted KNN, Ranger and Naive Bayes may provide better results than Rpart and LDA models. 
+
+
+# Further reseach
+
+There probably is no one imputation method that exceeds all the others in the matters discussed in this study. Although, further research, based on more datasets and imputation techniques, could help to provide more clearer guidelines for when to choose which imputation method, takig more than just the classification model used into consideration and when to choose which classification model.
