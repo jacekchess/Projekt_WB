@@ -237,14 +237,16 @@ ranking<-function(f1_combined){
 ```{r rating rpart, results='hide'}
 
 ranking_rpart<-ranking(f1_combined_rpart)
+means_rpart <- ranking_rpart%>%select(imputation, mean)
 ranking_rpart_melt<-melt(ranking_rpart%>%select(-mean))
 
 ggplot(ranking_rpart_melt, aes(x = imputation, y = value)) +
   geom_boxplot()+
   theme(axis.title.x = element_blank(),
-        axis.title.y = element_blank())
-  
-  
+        axis.title.y = element_blank()) +
+  stat_summary(fun.y=mean, colour="darkred", geom="point",
+               shape=18, size=3,show_guide = FALSE) +
+  geom_text(data = means_rpart, aes(label = round(mean, 2), y = mean + 0.1))
 ```
 
 ```{r write_ranking_rpart}
@@ -309,13 +311,16 @@ knitr::kable(f1_combined_nb, caption = "Tab.3. Naive Bayes results")
 
 ```{r rating nb, results='hide'}
 ranking_nb<-ranking(f1_combined_nb)
+means_nb <- ranking_nb%>%select(imputation, mean)
 ranking_nb_melt<-melt(ranking_nb%>%select(-mean))
 
 ggplot(ranking_nb_melt, aes(x = imputation, y = value)) +
   geom_boxplot()+
   theme(axis.title.x = element_blank(),
-        axis.title.y = element_blank())
-  
+        axis.title.y = element_blank()) +
+  stat_summary(fun.y=mean, colour="darkred", geom="point",
+               shape=18, size=3,show_guide = FALSE) +
+  geom_text(data = means_nb, aes(label = round(mean, 2), y = mean + 0.1))
 ```
 
 ```{r write_ranking_nb}
@@ -380,13 +385,16 @@ knitr::kable(f1_combined_ranger, caption = "Tab.4. Ranger results")
 
 ```{r rating ranger, results='hide'}
 ranking_ranger<-ranking(f1_combined_ranger)
+means_ranger <- ranking_ranger%>%select(imputation, mean)
 ranking_ranger_melt<-melt(ranking_ranger%>%select(-mean))
 
 ggplot(ranking_ranger_melt, aes(x = imputation, y = value)) +
   geom_boxplot()+
   theme(axis.title.x = element_blank(),
-        axis.title.y = element_blank())
-  
+        axis.title.y = element_blank()) +
+  stat_summary(fun.y=mean, colour="darkred", geom="point",
+               shape=18, size=3,show_guide = FALSE) +
+  geom_text(data = means_ranger, aes(label = round(mean, 2), y = mean + 0.1))
 ```
 
 ```{r write_ranking_ranger}
@@ -450,13 +458,16 @@ knitr::kable(f1_combined_lda, caption = "Tab.5. LDA results")
 
 ```{r rating lda, results='hide'}
 ranking_lda<-ranking(f1_combined_lda)
+means_lda <- ranking_lda%>%select(imputation, mean)
 ranking_lda_melt<-melt(ranking_lda%>%select(-mean))
 
 ggplot(ranking_lda_melt, aes(x = imputation, y = value)) +
   geom_boxplot()+
   theme(axis.title.x = element_blank(),
-        axis.title.y = element_blank())
-  
+        axis.title.y = element_blank()) +
+  stat_summary(fun.y=mean, colour="darkred", geom="point",
+               shape=18, size=3,show_guide = FALSE) +
+  geom_text(data = means_lda, aes(label = round(mean, 2), y = mean + 0.1))
 ```
 
 ```{r write_ranking_lda}
@@ -521,13 +532,16 @@ knitr::kable(f1_combined_kknn, caption = "Tab.6. KNN results")
 
 ```{r rating kknn, results='hide'}
 ranking_kknn<-ranking(f1_combined_kknn)
+means_kknn <- ranking_kknn%>%select(imputation, mean)
 ranking_kknn_melt<-melt(ranking_kknn%>%select(-mean))
 
 ggplot(ranking_kknn_melt, aes(x = imputation, y = value)) +
   geom_boxplot()+
   theme(axis.title.x = element_blank(),
-        axis.title.y = element_blank())
-  
+        axis.title.y = element_blank()) +
+  stat_summary(fun.y=mean, colour="darkred", geom="point",
+               shape=18, size=3,show_guide = FALSE) +
+  geom_text(data = means_kknn, aes(label = round(mean, 2), y = mean + 0.1))
 ```
 
 ```{r write_ranking_kknn}
